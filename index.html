@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Profiler · AI Behavioural Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f13;
+    --panel: #15171d;
+    --panel-2: #1b1e26;
+    --ink: #ecebe6;
+    --ink-dim: #9a9a92;
+    --ink-faint: #555962;
+    --line: #262932;
+    --accent: #d4ff3a;
+    --accent-2: #ff6b3d;
+    --accent-3: #6ba8ff;
+    --ok: #9be06b;
+    --warn: #ffb14d;
+    --danger: #ff6b7d;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter Tight', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(212,255,58,0.04), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(107,168,255,0.035), transparent 45%);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    z-index: 999;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+  }
+  .app {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px 22px 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 40px; height: 40px;
+    border: 1px solid var(--accent);
+    display: grid; place-items: center;
+    font-family: var(--mono);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 11px;
+    position: relative;
+  }
+  .logo::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 1px solid var(--accent);
+    opacity: 0.25;
+  }
+  .brand h1 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 22px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .brand .tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--ink-dim);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .status-badge {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    cursor: pointer;
+  }
+  .status-badge.live { border-color: var(--ok); color: var(--ok); }
+  .status-badge.setup { border-color: var(--accent-2); color: var(--accent-2); }
+  .modes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 20px 0 16px;
+    flex-shrink: 0;
+  }
+  .mode {
+    background: var(--panel);
+    padding: 14px 16px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .mode:hover { background: var(--panel-2); }
+  .mode.active { background: var(--panel-2); }
+  .mode.active::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+  .mode .num {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+  .mode.active .num { color: var(--accent); }
+  .mode .name {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 15px;
+    margin: 4px 0 2px;
+  }
+  .mode .desc {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-dim);
+    line-height: 1.4;
+  }
+  .chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 4px 20px;
+    min-height: 0;
+  }
+  .chat::-webkit-scrollbar { width: 6px; }
+  .chat::-webkit-scrollbar-thumb { background: var(--line); }
+  .msg {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .msg-av {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border: 1px solid var(--line);
+    display: grid; place-items: center;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    color: var(--ink-dim);
+    margin-top: 2px;
+  }
+  .msg.user .msg-av { color: var(--accent); border-color: var(--accent); }
+  .msg.bot .msg-av { color: var(--accent-3); border-color: var(--accent-3); }
+  .msg.system .msg-av { color: var(--warn); border-color: var(--warn); }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-role {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+  .msg-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .msg-text strong { color: var(--accent); font-weight: 600; }
+  .msg-text em { color: var(--ink-dim); font-style: italic; }
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px 0;
+  }
+  .typing span {
+    width: 6px; height: 6px;
+    background: var(--ink-faint);
+    border-radius: 50%;
+    animation: pulse 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+    30% { opacity: 1; transform: scale(1); background: var(--accent); }
+  }
+  .input-zone {
+    border-top: 1px solid var(--line);
+    padding: 16px 0 20px;
+    flex-shrink: 0;
+    background: var(--bg);
+  }
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .input-row textarea {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 14px 16px;
+    font-family: inherit;
+    font-size: 14.5px;
+    line-height: 1.5;
+    resize: none;
+    min-height: 52px;
+    max-height: 160px;
+  }
+  .input-row textarea:focus { outline: none; border-color: var(--accent); }
+  .input-row button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0 22px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    height: 52px;
+    transition: opacity 0.15s;
+  }
+  .input-row button:hover { opacity: 0.85; }
+  .input-row button:disabled {
+    background: var(--line);
+    color: var(--ink-faint);
+    cursor: not-allowed;
+  }
+  .footer-note {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+  .footer-note button {
+    background: none;
+    border: none;
+    color: var(--ink-dim);
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    letter-spacing: inherit;
+    padding: 0;
+    margin: 0 6px;
+  }
+  .footer-note button:hover { color: var(--accent); }
+
+  /* ============= SETUP MODAL ============= */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(5,6,9,0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 32px;
+    max-width: 580px;
+    width: 100%;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 26px;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .modal .sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .modal h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    margin: 22px 0 8px;
+    color: var(--ink);
+  }
+  .modal p, .modal ol, .modal ul {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+  }
+  .modal ol, .modal ul { padding-left: 20px; }
+  .modal ol li, .modal ul li { margin-bottom: 6px; }
+  .modal a { color: var(--accent-3); }
+  .modal input[type="password"], .modal input[type="text"] {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    margin: 10px 0 6px;
+  }
+  .modal input:focus { outline: none; border-color: var(--accent); }
+  .modal .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .modal button.primary {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 12px 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .modal button.secondary {
+    background: transparent;
+    color: var(--ink-dim);
+    border: 1px solid var(--line);
+    padding: 12px 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .modal button:hover { opacity: 0.85; }
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    width: 28px; height: 28px;
+    font-family: var(--mono);
+    cursor: pointer;
+  }
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+  .modal .warn {
+    background: rgba(255,107,61,0.08);
+    border-left: 2px solid var(--accent-2);
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    line-height: 1.55;
+  }
+  .modal code {
+    background: var(--panel-2);
+    padding: 1px 6px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--accent);
+    border: 1px solid var(--line);
+  }
+
+  @media (max-width: 640px) {
+    .app { padding: 14px 14px 0; }
+    .modes { grid-template-columns: 1fr; }
+    .mode.active::before { width: 2px; height: 100%; top: 0; bottom: 0; right: auto; }
+    .brand h1 { font-size: 18px; }
+    .brand .tag { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">TP/00</div>
+      <div>
+        <h1>The Profiler</h1>
+        <div class="tag">Behavioural analysis · three modes</div>
+      </div>
+    </div>
+    <button class="status-badge setup" id="statusBtn">Setup required</button>
+  </header>
+
+  <div class="modes" id="modes">
+    <div class="mode active" data-mode="profile">
+      <div class="num">01 / READ</div>
+      <div class="name">Profile a prospect</div>
+      <div class="desc">Paste their content. Get a behavioural read.</div>
+    </div>
+    <div class="mode" data-mode="assess">
+      <div class="num">02 / MIRROR</div>
+      <div class="name">Self-assessment</div>
+      <div class="desc">Conversational inventory. No tick boxes.</div>
+    </div>
+    <div class="mode" data-mode="coach">
+      <div class="num">03 / WORK</div>
+      <div class="name">Coach mode</div>
+      <div class="desc">Pick a level. Get a drill. Execute.</div>
+    </div>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="input-zone">
+    <div class="input-row">
+      <textarea id="input" placeholder="Waiting for setup..." rows="1" disabled></textarea>
+      <button id="send" disabled>Send</button>
+    </div>
+    <div class="footer-note">
+      <button id="resetBtn">Reset conversation</button> ·
+      <button id="setupBtn">Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============= SETUP MODAL ============= -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">×</button>
+    <h3>Connect to Claude</h3>
+    <div class="sub">One-time setup · 2 minutes</div>
+
+    <p>The Profiler needs access to Claude (Anthropic's AI) to generate real behavioural analysis. Choose how you want to connect:</p>
+
+    <h4>Option A · Browser key (fastest, for testing)</h4>
+    <p>Paste your Anthropic API key below. It stays in this browser session only.</p>
+
+    <div class="warn">
+      <strong style="color: var(--accent-2);">Only use this for private testing.</strong> Anyone who can view your page source could see the key. For public/classroom use, set up Option B instead.
+    </div>
+
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+    <p style="font-size: 12px; margin-top: 0;">
+      Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> · Free to create · pay-as-you-go (~2–10¢ per conversation)
+    </p>
+
+    <div class="btn-row">
+      <button class="primary" id="saveKeyBtn">Save and start</button>
+      <button class="secondary" id="serverInfoBtn">Show Option B</button>
+    </div>
+
+    <div id="serverInfo" style="display:none; margin-top: 26px; padding-top: 20px; border-top: 1px dashed var(--line);">
+      <h4>Option B · Vercel deployment (secure, for live use)</h4>
+      <p>Your key lives on Vercel, hidden from users. This is what to use for the Skool classroom.</p>
+      <ol>
+        <li>Go to <a href="https://vercel.com" target="_blank">vercel.com</a> and sign up (free).</li>
+        <li>Create a new project. Upload this HTML file as <code>index.html</code>.</li>
+        <li>Create a folder called <code>api</code> and add a file called <code>chat.js</code> — I'll send the code separately.</li>
+        <li>In Vercel project settings → Environment Variables, add <code>ANTHROPIC_API_KEY</code> with your key as the value.</li>
+        <li>Deploy. Drop the URL in your Skool classroom.</li>
+      </ol>
+      <p style="margin-top: 14px;">Once deployed, this page automatically detects the server endpoint at <code>/api/chat</code> and uses it — no further setup needed.</p>
+      <p>Ask me (Claude) for "the server-side code for the profiler bot" when you're ready to deploy.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // ============================================================
+  // SYSTEM PROMPTS — the actual "intelligence" of the bot
+  // ============================================================
+  const SYSTEM_PROMPTS = {
+    profile: `You are The Profiler — a behavioural analysis tool that reads people from their digital content.
+
+Your framework has three traits, each on a 1–5 scale:
+
+CONFIDENCE — the ability to maintain an excellent reputation with self, and fully trust in one's own ability to generate positive outcomes.
+- L1: Unable to start conversations with strangers, panics meeting new people, socially withdrawn, takes criticism personally, gives up on goals.
+- L2: Can't put phone down socially, backs down in disagreements, compares self to others, doubts own judgment, allows putdowns.
+- L3: Over-analyses what people say, compares successes, measures self-worth by outside opinions, needs validation, can start conversations if supportive.
+- L4: Influences others through behaviour, tactfully disagrees, takes action with little apprehension, thanks others for criticism, sets shared goals.
+- L5: Confidence is contagious, converses with anyone, no need for reassurance, takes action without reservation, others emulate them.
+
+DISCIPLINE — level of self-control; brings confidence and composure to new levels through nonverbal communication.
+- L1: Neglects daily tasks, no active goals, no routine, poor fitness/appearance, unable to prioritise.
+- L2: Only does self-interest tasks, minimal hygiene, sets goals but neglects them, impulsive spending.
+- L3: Neglects tasks that aren't fun, distracted by electronics, mostly wakes on time, reasonable diet/fitness.
+- L4: Others follow their discipline lead, wakes when planned, neat appearance, financially responsible, prioritises time, can say no.
+- L5: Forms habits without distraction, accomplishes all milestones, manages time by priority daily, contagious discipline.
+
+LEADERSHIP — ability to produce following behaviour in others through behaviour alone, not just verbal.
+- L1: Takes credit for others' wins, blames others, poor communicator, emotional outbursts, inflates success, looks for negatives in others.
+- L2: Self-aggrandising, blames circumstances, white lies, unable to see others' good qualities.
+- L3: Makes others comfortable, reasons well, sets positive example, handles some stress, displays humility when possible.
+- L4: Inspires others, offers credit to subordinates, genuine concern for others, makes others feel significant, perseveres through stress.
+- L5: Sets the example for everyone, contagious leadership, never takes team credit, lifts others always, displays humility always.
+
+YOUR JOB in profile mode:
+The user pastes content written by/about a prospect — LinkedIn About, bio, tweet thread, email, etc. You analyse it and return:
+
+1. **Behavioural read** — level estimate for each trait with one-line evidence (cite specific phrases).
+2. **Likely objection** — what they'll push back on in a sales conversation, based on their profile.
+3. **Recommended approach** — one specific tactical suggestion for outreach.
+
+SIGNAL CATEGORIES to weight:
+- Pronoun ratio (I/we/you balance)
+- Hedging language clustering
+- Time orientation (past vs future)
+- Specificity of claims
+- How they handle conflict or disagreement
+- What's absent (if every leader brags about their team and this person doesn't, that's data)
+
+TONE: Direct, observational, zero fluff. Cite evidence from the text. Don't flatter the prospect or the user. If the content is too thin to profile accurately, say so and ask for more.
+
+Keep responses to 200–350 words unless the user asks for deeper analysis. Use bold for key terms. Use level chips in this format: [L4 CONFIDENCE] at the start of each trait reading.`,
+
+    assess: `You are The Profiler in self-assessment mode — a behavioural coach who scores the user across Confidence, Discipline and Leadership based on how they describe real situations, not how they rate themselves on checklists.
+
+Use the same 1–5 scale across the three traits (full framework defined elsewhere in your instructions).
+
+YOUR JOB:
+Walk the user through 5 behavioural questions. These aren't about opinions — they're about specific past events. After each answer, score silently and ask a clarifying follow-up if needed. At the end, deliver the full read.
+
+THE 5 QUESTIONS (adapt exact wording to flow):
+1. CONFIDENCE — Walk me through the last time someone gave you critical feedback you didn't expect. What happened inside you in the first 30 seconds? What did you do in the 24 hours after?
+2. DISCIPLINE — Describe the last goal you set and didn't hit. What went wrong — specifically, in your behaviour, not your circumstances?
+3. LEADERSHIP — Tell me about the last time you got credit for something that wasn't entirely yours. What did you do?
+4. DISCIPLINE/CONFIDENCE — When's the last time you said no to something that would have been enjoyable but off-priority? How did it feel?
+5. LEADERSHIP — Tell me about someone you've watched struggle recently. What did you actually do about it?
+
+RULES:
+- Ask ONE question at a time. Wait for the answer before moving on.
+- If an answer is short or evasive, ask a follow-up like "What specifically did you do?" or "Walk me through that moment in more detail." Don't let vague answers through.
+- Never tell them their score mid-assessment. Only at the end.
+- At the end: deliver scores for all three traits with ONE line of evidence each (quote them back to themselves), name their peak level, and give ONE behavioural recommendation.
+
+TONE: Warm but unflinching. You're a mirror, not a cheerleader. Don't over-praise or soften. Be direct.
+
+When the user first arrives, greet them briefly and ask them to say "start" or "ready" when they're willing to begin. Start with question 1 only when they confirm.`,
+
+    coach: `You are The Profiler in coach mode — you design specific 7-day behavioural drills that move the user from their current level to the next level in one of the three traits.
+
+Framework: Confidence, Discipline, Leadership, each 1–5 (full descriptors defined elsewhere in your instructions).
+
+YOUR JOB:
+User tells you where they're stuck (e.g., "Discipline L3"). You:
+
+1. Identify the SPECIFIC behaviour from the next level up that they're missing most often.
+2. Design a 7-day drill with concrete daily actions.
+3. Tell them what to track, what to watch for, and when to report back.
+4. Give them ONE behaviour from the inventory they're installing.
+
+STRUCTURE every coaching response:
+- Short diagnostic framing (1–2 sentences) explaining why that level tends to plateau
+- "7-DAY PROTOCOL" header
+- Day-by-day or phased breakdown (Day 1–2 / Day 3 / Day 4–7 pattern works well)
+- The target behaviour quoted from the framework
+- Report-back instruction (check in day 3 and/or day 7)
+- End with a setup question to get them started
+
+RULES:
+- Drills must be SPECIFIC, not generic advice. "Phone in another room during focus blocks" not "reduce distractions."
+- Keep to 200–350 words.
+- Use bold for key terms and the protocol header.
+- If they haven't told you a level yet, ask them specifically which trait and level.
+- If they don't know their level, tell them to run the self-assessment first.
+
+TONE: Direct, accountability-focused, no motivational filler. You're running them through a drill, not cheerleading.`
+  };
+
+  // Greeting messages when switching modes
+  const INTROS = {
+    profile: `I read people from their digital footprint. Paste something they wrote — a LinkedIn About, a bio, a tweet thread, an email they sent you — and I'll give you a behavioural read across Confidence, Discipline and Leadership.\n\nThe more text, the sharper the read.`,
+    assess: `This is the mirror. I'll ask you five behavioural questions — not tick-boxes, actual situations. Answer honestly. From your answers I'll score you across Confidence, Discipline and Leadership and tell you exactly what level you're operating at right now.\n\nSay "start" when you're ready.`,
+    coach: `Tell me which level you're stuck at and I'll build you a 7-day drill. Be specific — "Discipline Level 3" or "Leadership Level 2." If you don't know your level yet, run the self-assessment first.`
+  };
+
+  const PLACEHOLDERS = {
+    profile: "Paste the prospect's content here...",
+    assess: "Type 'start' to begin...",
+    coach: "e.g., 'I'm stuck at Discipline Level 3'"
+  };
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  let currentMode = 'profile';
+  let apiKey = null;           // browser-stored key (session only)
+  let useServer = false;        // true if /api/chat exists
+  const history = { profile: [], assess: [], coach: [] };
+
+  // ============================================================
+  // DOM
+  // ============================================================
+  const chatEl = document.getElementById('chat');
+  const inputEl = document.getElementById('input');
+  const sendBtn = document.getElementById('send');
+  const modal = document.getElementById('modal');
+  const statusBtn = document.getElementById('statusBtn');
+
+  // ============================================================
+  // API — tries server first, falls back to direct call with key
+  // ============================================================
+  async function detectServer() {
+    try {
+      const res = await fetch('/api/chat', { method: 'OPTIONS' });
+      return res.ok || res.status === 405;  // 405 = method not allowed but endpoint exists
+    } catch { return false; }
+  }
+
+  async function callClaude(systemPrompt, messages) {
+    // Try server first
+    if (useServer) {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ system: systemPrompt, messages })
+      });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const data = await res.json();
+      return data.reply;
+    }
+
+    // Fallback: direct browser call (requires key)
+    if (!apiKey) throw new Error('No API key set');
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages
+      })
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Claude error ${res.status}: ${errText}`);
+    }
+
+    const data = await res.json();
+    return data.content[0].text;
+  }
+
+  // ============================================================
+  // UI RENDER
+  // ============================================================
+  function renderText(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  }
+
+  function addMsg(role, text, isTyping) {
+    const msg = document.createElement('div');
+    msg.className = 'msg ' + role;
+    const labels = {
+      user: ['YOU', 'You'],
+      bot: ['TP', 'The Profiler'],
+      system: ['!', 'System']
+    };
+    const [av, roleLabel] = labels[role] || labels.bot;
+    msg.innerHTML = `
+      <div class="msg-av">${av}</div>
+      <div class="msg-body">
+        <div class="msg-role">${roleLabel}</div>
+        <div class="msg-text">${isTyping ? '<span class="typing"><span></span><span></span><span></span></span>' : renderText(text)}</div>
+      </div>
+    `;
+    chatEl.appendChild(msg);
+    chatEl.scrollTop = chatEl.scrollHeight;
+    return msg;
+  }
+
+  function clearChat() { chatEl.innerHTML = ''; }
+
+  function renderIntro() {
+    clearChat();
+    history[currentMode].forEach(m => addMsg(m.role, m.text));
+    if (history[currentMode].length === 0) {
+      addMsg('bot', INTROS[currentMode]);
+    }
+    inputEl.placeholder = PLACEHOLDERS[currentMode];
+  }
+
+  function setConnected(connected, label) {
+    if (connected) {
+      statusBtn.className = 'status-badge live';
+      statusBtn.textContent = label || 'Live · connected';
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.placeholder = PLACEHOLDERS[currentMode];
+    } else {
+      statusBtn.className = 'status-badge setup';
+      statusBtn.textContent = 'Setup required';
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+      inputEl.placeholder = 'Click "Setup required" to connect...';
+    }
+  }
+
+  // ============================================================
+  // SEND
+  // ============================================================
+  async function send() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    addMsg('user', text);
+    history[currentMode].push({ role: 'user', content: text });
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    const typing = addMsg('bot', '', true);
+
+    try {
+      // Build messages array (Claude expects 'user' and 'assistant' roles)
+      const messages = history[currentMode].map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content
+      }));
+
+      const reply = await callClaude(SYSTEM_PROMPTS[currentMode], messages);
+
+      typing.remove();
+      addMsg('bot', reply);
+      history[currentMode].push({ role: 'assistant', content: reply });
+    } catch (err) {
+      typing.remove();
+      addMsg('system', `Connection error: ${err.message}\n\nCheck your API key in Settings, or check the browser console.`);
+      console.error(err);
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  // ============================================================
+  // MODE SWITCHING
+  // ============================================================
+  document.querySelectorAll('.mode').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.mode').forEach(m => m.classList.remove('active'));
+      el.classList.add('active');
+      currentMode = el.dataset.mode;
+      renderIntro();
+    });
+  });
+
+  // ============================================================
+  // MODAL / SETUP
+  // ============================================================
+  function openModal() { modal.classList.add('open'); }
+  function closeModal() { modal.classList.remove('open'); }
+
+  statusBtn.addEventListener('click', openModal);
+  document.getElementById('setupBtn').addEventListener('click', openModal);
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  document.getElementById('serverInfoBtn').addEventListener('click', () => {
+    const el = document.getElementById('serverInfo');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('saveKeyBtn').addEventListener('click', () => {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val.startsWith('sk-ant')) {
+      alert('That doesn\'t look like an Anthropic API key. They start with "sk-ant".');
+      return;
+    }
+    apiKey = val;
+    useServer = false;
+    setConnected(true, 'Live · browser key');
+    closeModal();
+  });
+
+  // ============================================================
+  // CONTROLS
+  // ============================================================
+  sendBtn.addEventListener('click', send);
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + 'px';
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('Reset this conversation?')) return;
+    history[currentMode] = [];
+    renderIntro();
+  });
+
+  // ============================================================
+  // BOOT
+  // ============================================================
+  async function init() {
+    renderIntro();
+    // Check for server endpoint
+    if (await detectServer()) {
+      useServer = true;
+      setConnected(true, 'Live · server');
+    } else {
+      // No server. Show setup modal on first load.
+      setConnected(false);
+      setTimeout(openModal, 400);
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
