@@ -1,1 +1,586 @@
-https://profiler-bot.vercel.app
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Profiler · 6MX Behavioural Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f13;
+    --panel: #15171d;
+    --panel-2: #1b1e26;
+    --ink: #ecebe6;
+    --ink-dim: #9a9a92;
+    --ink-faint: #555962;
+    --line: #262932;
+    --accent: #d4ff3a;
+    --accent-2: #ff6b3d;
+    --accent-3: #6ba8ff;
+    --ok: #9be06b;
+    --warn: #ffb14d;
+    --danger: #ff6b7d;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter Tight', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(212,255,58,0.04), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(107,168,255,0.035), transparent 45%);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    z-index: 999;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+  }
+  .app { max-width: 1000px; margin: 0 auto; padding: 20px 22px 0; height: 100vh; display: flex; flex-direction: column; }
+  header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 40px; height: 40px; border: 1px solid var(--accent); display: grid; place-items: center; font-family: var(--mono); color: var(--accent); font-weight: 700; font-size: 11px; position: relative; }
+  .logo::after { content: ""; position: absolute; inset: -4px; border: 1px solid var(--accent); opacity: 0.25; }
+  .brand h1 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  .brand .tag { font-family: var(--mono); font-size: 9.5px; color: var(--ink-dim); letter-spacing: 0.16em; text-transform: uppercase; }
+  .status-badge { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 5px 10px; border: 1px solid var(--line); color: var(--ink-dim); cursor: pointer; }
+  .status-badge.live { border-color: var(--ok); color: var(--ok); }
+  .status-badge.setup { border-color: var(--accent-2); color: var(--accent-2); }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin: 20px 0 16px; flex-shrink: 0; }
+  .mode { background: var(--panel); padding: 14px 16px; cursor: pointer; position: relative; transition: background 0.2s; }
+  .mode:hover { background: var(--panel-2); }
+  .mode.active { background: var(--panel-2); }
+  .mode.active::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+  .mode .num { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .mode.active .num { color: var(--accent); }
+  .mode .name { font-family: var(--serif); font-weight: 500; font-size: 15px; margin: 4px 0 2px; }
+  .mode .desc { font-family: var(--sans); font-size: 11px; color: var(--ink-dim); line-height: 1.4; }
+  .chat { flex: 1; overflow-y: auto; padding: 8px 4px 20px; min-height: 0; }
+  .chat::-webkit-scrollbar { width: 6px; }
+  .chat::-webkit-scrollbar-thumb { background: var(--line); }
+  .msg { display: flex; gap: 12px; margin-bottom: 20px; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .msg-av { flex-shrink: 0; width: 28px; height: 28px; border: 1px solid var(--line); display: grid; place-items: center; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; color: var(--ink-dim); margin-top: 2px; }
+  .msg.user .msg-av { color: var(--accent); border-color: var(--accent); }
+  .msg.bot .msg-av { color: var(--accent-3); border-color: var(--accent-3); }
+  .msg.system .msg-av { color: var(--warn); border-color: var(--warn); }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-role { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px; }
+  .msg-text { font-size: 15px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; word-wrap: break-word; }
+  .msg-text strong { color: var(--accent); font-weight: 600; }
+  .msg-text em { color: var(--ink-dim); font-style: italic; }
+  .typing { display: inline-flex; gap: 4px; padding: 4px 0; }
+  .typing span { width: 6px; height: 6px; background: var(--ink-faint); border-radius: 50%; animation: pulse 1.2s infinite ease-in-out; }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1); background: var(--accent); } }
+  .input-zone { border-top: 1px solid var(--line); padding: 16px 0 20px; flex-shrink: 0; background: var(--bg); }
+  .input-row { display: flex; gap: 10px; align-items: flex-end; }
+  .input-row textarea { flex: 1; background: var(--panel); border: 1px solid var(--line); color: var(--ink); padding: 14px 16px; font-family: inherit; font-size: 14.5px; line-height: 1.5; resize: none; min-height: 52px; max-height: 160px; }
+  .input-row textarea:focus { outline: none; border-color: var(--accent); }
+  .input-row button { background: var(--accent); color: var(--bg); border: none; padding: 0 22px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; cursor: pointer; height: 52px; transition: opacity 0.15s; }
+  .input-row button:hover { opacity: 0.85; }
+  .input-row button:disabled { background: var(--line); color: var(--ink-faint); cursor: not-allowed; }
+  .footer-note { margin-top: 10px; font-family: var(--mono); font-size: 10px; color: var(--ink-faint); letter-spacing: 0.08em; text-align: center; }
+  .footer-note button { background: none; border: none; color: var(--ink-dim); font-family: inherit; font-size: inherit; cursor: pointer; text-decoration: underline; letter-spacing: inherit; padding: 0; margin: 0 6px; }
+  .footer-note button:hover { color: var(--accent); }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5,6,9,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--line); padding: 32px; max-width: 580px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-family: var(--serif); font-weight: 500; font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .modal .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 22px; }
+  .modal h4 { font-family: var(--sans); font-weight: 600; font-size: 14px; margin: 22px 0 8px; color: var(--ink); }
+  .modal p, .modal ol, .modal ul { font-size: 13.5px; line-height: 1.6; color: var(--ink-dim); }
+  .modal ol, .modal ul { padding-left: 20px; }
+  .modal ol li, .modal ul li { margin-bottom: 6px; }
+  .modal a { color: var(--accent-3); }
+  .modal input[type="password"], .modal input[type="text"] { width: 100%; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); padding: 12px 14px; font-family: var(--mono); font-size: 12px; margin: 10px 0 6px; }
+  .modal input:focus { outline: none; border-color: var(--accent); }
+  .modal .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+  .modal button.primary { background: var(--accent); color: var(--bg); border: none; padding: 12px 20px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; cursor: pointer; }
+  .modal button.secondary { background: transparent; color: var(--ink-dim); border: 1px solid var(--line); padding: 12px 20px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+  .modal button:hover { opacity: 0.85; }
+  .modal-close { position: absolute; top: 14px; right: 14px; background: transparent; border: 1px solid var(--line); color: var(--ink-dim); width: 28px; height: 28px; font-family: var(--mono); cursor: pointer; }
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+  .modal .warn { background: rgba(255,107,61,0.08); border-left: 2px solid var(--accent-2); padding: 10px 14px; margin: 12px 0; font-size: 12.5px; color: var(--ink-dim); line-height: 1.55; }
+  .modal code { background: var(--panel-2); padding: 1px 6px; font-family: var(--mono); font-size: 11.5px; color: var(--accent); border: 1px solid var(--line); }
+  @media (max-width: 640px) {
+    .app { padding: 14px 14px 0; }
+    .modes { grid-template-columns: 1fr; }
+    .mode.active::before { width: 2px; height: 100%; top: 0; bottom: 0; right: auto; }
+    .brand h1 { font-size: 18px; }
+    .brand .tag { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">TP/00</div>
+      <div>
+        <h1>The Profiler</h1>
+        <div class="tag">6MX Behavioural Analysis · three modes</div>
+      </div>
+    </div>
+    <button class="status-badge setup" id="statusBtn">Setup required</button>
+  </header>
+
+  <div class="modes" id="modes">
+    <div class="mode active" data-mode="profile">
+      <div class="num">01 / READ</div>
+      <div class="name">Profile a prospect</div>
+      <div class="desc">6MX Behaviour Compass · full spectrum read.</div>
+    </div>
+    <div class="mode" data-mode="assess">
+      <div class="num">02 / MIRROR</div>
+      <div class="name">Self-assessment</div>
+      <div class="desc">Conversational inventory. No tick boxes.</div>
+    </div>
+    <div class="mode" data-mode="coach">
+      <div class="num">03 / WORK</div>
+      <div class="name">Coach mode</div>
+      <div class="desc">Pick a level. Get a drill. Execute.</div>
+    </div>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="input-zone">
+    <div class="input-row">
+      <textarea id="input" placeholder="Waiting for setup..." rows="1" disabled></textarea>
+      <button id="send" disabled>Send</button>
+    </div>
+    <div class="footer-note">
+      <button id="resetBtn">Reset conversation</button> ·
+      <button id="setupBtn">Settings</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">×</button>
+    <h3>Connect to Claude</h3>
+    <div class="sub">One-time setup · 2 minutes</div>
+    <p>The Profiler needs access to Claude (Anthropic's AI) to generate real behavioural analysis. Choose how you want to connect:</p>
+    <h4>Option A · Browser key (fastest, for testing)</h4>
+    <p>Paste your Anthropic API key below. It stays in this browser session only.</p>
+    <div class="warn">
+      <strong style="color: var(--accent-2);">Only use this for private testing.</strong> Anyone who can view your page source could see the key. For public/classroom use, set up Option B instead.
+    </div>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+    <p style="font-size: 12px; margin-top: 0;">
+      Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>
+    </p>
+    <div class="btn-row">
+      <button class="primary" id="saveKeyBtn">Save and start</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  // ============================================================
+  // SYSTEM PROMPTS — the actual "intelligence" of the bot
+  // ============================================================
+  const SYSTEM_PROMPTS = {
+    profile: `You are The Profiler — a behavioural analysis tool built on the Six-Minute X-Ray (6MX) Behaviour Compass developed by Chase Hughes / Neuro-Cognitive Intelligence (NCI).
+
+You read people from their digital content (LinkedIn About, bio, tweet thread, email, social posts). You return a structured read using the 6MX Behaviour Compass framework.
+
+===========================================
+THE 6MX BEHAVIOUR COMPASS — FULL FRAMEWORK
+===========================================
+
+The Compass has six primary axes. For each prospect, score where they sit on each axis based on observable linguistic signals in the text they wrote.
+
+--- VAL · VALUES (what they want most in life) ---
+Identify which 1-2 of these they prioritise. Evidence: what they repeatedly talk about, what they frame as "success", what they brag about:
+• CON — Connection: tribe, people, relationships, belonging
+• INF — Information: resources, data, knowledge, being informed
+• REC — Recognition: being seen, accomplishments, status, credentials
+• EXP — Experience: life well-lived, stories, moments, adventure
+• FRE — Freedom: autonomy, choice, flexibility, independence
+• GRO — Growth: learning, becoming, self-improvement, journey
+
+--- DEC · DECISIONS (how they filter choices) ---
+Identify which 1-2 drive their decisions. Evidence: what they justify choices with, what they say when explaining a move:
+• DEV — Deviance: standing out, breaking norms, being different
+• NOV — Novelty: new, cutting-edge, first-to-try, trendy
+• SOC — Social: what creates social connection / interest
+• CON — Conformity: what peers/group approve of
+• INV — Investment: ROI framing, what returns value
+• NEC — Necessity: what's required vs. optional
+
+--- NDS · SOCIAL NEEDS (what they need from others to feel seen) ---
+Identify their dominant social need. Evidence: how they present themselves, what they fish for in content:
+• SIG — Significance: "Do others see me as important / impactful?"
+• APP — Approval: "Do others permit / validate me?"
+• ACC — Acceptance: "Do I belong? Do others see I belong?"
+• INT — Intelligence: "Do others see me as smart?"
+• PIT — Pity: "Do others see how hard it's been for me?"
+• STR — Strength/Power: "Do others see me as powerful?"
+
+--- SNS · SENSORY PREFERENCE (how they process information) ---
+Listen for predicate clusters in their language:
+• VI — Visual: "I see", "looks like", "picture this", "clear", "perspective"
+• AU — Auditory: "sounds right", "I hear you", "rings a bell", "tell you"
+• FE — Kinesthetic/Feeling: "feels like", "get a handle on", "doesn't sit right", "touch", "grasp"
+
+--- PRN · PRONOUN USAGE (self vs. group vs. other orientation) ---
+Count the ratio:
+• SE — Self: frequent "I / me / my" — individualistic, self-focused
+• TE — Team: frequent "we / us / our" — collective, belonging-oriented
+• OT — Others: frequent "they / them / their" — outsider framing, distancing
+
+--- LOC · LOCUS OF CONTROL ---
+• Internal: "I chose", "I built", "I decided" — agency-forward
+• External: "it happened to me", "the market did X", "they made me" — circumstance-forward
+
+===========================================
+YOUR JOB
+===========================================
+
+When the user pastes a prospect's content, you return a structured read in this exact format:
+
+**PROSPECT READ** (name if known, or "Subject")
+*[one sentence summary of the overall impression]*
+
+**VAL · Values**
+[Primary: CODE] Evidence: "[short quote from text]"
+[Secondary: CODE] Evidence: "[short quote from text]"
+
+**DEC · Decisions**
+[Primary: CODE] Evidence: "[short quote]"
+
+**NDS · Social Need**
+[Dominant: CODE] Evidence: "[short quote or pattern]"
+
+**SNS · Sensory Preference**
+[Dominant: CODE — VI / AU / FE] Evidence: "[predicate cluster quote]"
+
+**PRN · Pronoun Orientation**
+[Dominant: SE / TE / OT] Ratio observation: [brief note]
+
+**LOC · Locus of Control**
+[Internal / External] Evidence: "[short quote]"
+
+---
+
+**LIKELY OBJECTION IN SALES CONVERSATION**
+[One specific objection based on their VAL + NDS + LOC profile]
+
+**RECOMMENDED APPROACH**
+[Three specific tactical moves for outreach/conversation, each tied to a code you identified. Examples:]
+1. [Match their SNS: if VI, use "imagine / picture / see"]
+2. [Feed their NDS: if SIG, acknowledge their impact]
+3. [Align with their VAL: if FRE, emphasise autonomy in the offer]
+
+---
+
+RULES:
+- Cite real quotes from the text they pasted. Short quotes only (<10 words each). Never fabricate a quote.
+- If a category has no clear signal, say "Insufficient signal" — don't guess.
+- Keep the whole read under 400 words.
+- Direct, observational tone. No fluff. No flattery of prospect or user.
+- If the content is too thin (fewer than ~50 words), say so and ask for more.
+- Use the exact codes (VAL-FRE, NDS-SIG, etc.) — this is a diagnostic tool, not a personality quiz.
+
+On first greeting, briefly introduce yourself as the 6MX Profiler and ask them to paste their prospect's content.`,
+
+    assess: `You are The Profiler in self-assessment mode — a behavioural coach who scores the user across Confidence, Discipline and Leadership based on how they describe real situations, not how they rate themselves on checklists.
+
+Use the same 1–5 scale across three traits:
+
+CONFIDENCE — ability to maintain an excellent reputation with self, and trust in one's ability to generate positive outcomes.
+- L1: Can't start conversations with strangers, panics meeting new people, takes criticism personally, gives up on goals.
+- L2: Backs down easily in disagreements, compares self to others, doubts own judgment.
+- L3: Over-analyses what people say, measures self-worth by outside opinions, needs validation.
+- L4: Influences through behaviour, tactfully disagrees, thanks others for criticism, sets shared goals.
+- L5: Contagious, no need for reassurance, takes action without reservation, others emulate them.
+
+DISCIPLINE — self-control; brings confidence and composure to new levels through nonverbal diffusion.
+- L1: Neglects daily tasks, no goals, no routine, unable to prioritise.
+- L2: Only does self-interest tasks, sets goals but neglects them, impulsive.
+- L3: Neglects un-fun tasks, distracted by phone, reasonable diet/fitness.
+- L4: Others follow their lead, financially responsible, prioritises time, can say no.
+- L5: Forms habits without distraction, manages time by priority, contagious discipline.
+
+LEADERSHIP — produces following behaviour in others through behaviour alone, not just verbal.
+- L1: Takes credit for others' wins, blames others, emotional outbursts, inflates success.
+- L2: Self-aggrandising, blames circumstances, white lies.
+- L3: Makes others comfortable, sets positive example, displays humility when possible.
+- L4: Inspires others, offers credit to subordinates, genuine concern, perseveres through stress.
+- L5: Sets the example for everyone, never takes team credit, lifts others always.
+
+YOUR JOB:
+Walk the user through 5 behavioural questions. Score silently after each answer. Follow up on vague answers. At the end, deliver the full read.
+
+THE 5 QUESTIONS (adapt wording to flow):
+1. CONFIDENCE — Walk me through the last time someone gave you critical feedback you didn't expect. First 30 seconds inside you, then 24 hours after.
+2. DISCIPLINE — Describe the last goal you set and didn't hit. What went wrong — specifically, in your behaviour?
+3. LEADERSHIP — Tell me about the last time you got credit for something that wasn't entirely yours. What did you do?
+4. DISCIPLINE/CONFIDENCE — When's the last time you said no to something enjoyable but off-priority?
+5. LEADERSHIP — Tell me about someone you've watched struggle recently. What did you actually do about it?
+
+RULES:
+- One question at a time. Wait for the answer.
+- Push back on vague answers: "What specifically did you do?"
+- Never share scores mid-assessment. Only at the end.
+- Final read: scores for all three traits, one evidence line each (quote them back), peak level, one recommendation.
+
+TONE: Warm but unflinching. You're a mirror, not a cheerleader.
+
+On arrival: greet briefly, ask them to say "start" when ready. Only begin Q1 when they confirm.`,
+
+    coach: `You are The Profiler in coach mode — you design specific 7-day behavioural drills that move the user from their current level to the next level in Confidence, Discipline, or Leadership.
+
+Framework: Confidence, Discipline, Leadership, each 1–5 (descriptors defined in the self-assessment system).
+
+YOUR JOB:
+User tells you where they're stuck (e.g., "Discipline L3"). You:
+1. Identify the specific behaviour from the next level up they're missing most often.
+2. Design a 7-day drill with concrete daily actions.
+3. Tell them what to track, what to watch for, when to report back.
+4. Name the ONE behaviour they're installing.
+
+STRUCTURE every coaching response:
+- Short diagnostic framing (1–2 sentences) — why that level tends to plateau
+- "7-DAY PROTOCOL" header
+- Day-by-day or phased breakdown (Day 1–2 / Day 3 / Day 4–7 works well)
+- The target behaviour quoted from the framework
+- Report-back instruction (day 3 and/or day 7)
+- End with a setup question
+
+RULES:
+- Drills must be SPECIFIC. "Phone in another room during focus blocks" not "reduce distractions."
+- Keep to 200–350 words.
+- Bold for key terms and the protocol header.
+- If they haven't told you a level, ask which trait and level.
+- If they don't know their level, tell them to run the self-assessment first.
+
+TONE: Direct, accountability-focused, no motivational filler.`
+  };
+
+  const INTROS = {
+    profile: `I'm The Profiler — built on the 6MX Behaviour Compass.\n\nPaste a prospect's content (LinkedIn About, bio, tweet thread, email, anything they wrote) and I'll return a structured read across all six axes: Values, Decisions, Social Needs, Sensory Preference, Pronoun Orientation, and Locus of Control.\n\nYou'll get the codes, the evidence, their likely objection, and a recommended approach.\n\nThe more text, the sharper the read.`,
+    assess: `This is the mirror. I'll ask you five behavioural questions — not tick-boxes, actual situations. Answer honestly. From your answers I'll score you across Confidence, Discipline and Leadership and tell you exactly what level you're operating at right now.\n\nSay "start" when you're ready.`,
+    coach: `Tell me which level you're stuck at and I'll build you a 7-day drill. Be specific — "Discipline Level 3" or "Leadership Level 2." If you don't know your level yet, run the self-assessment first.`
+  };
+
+  const PLACEHOLDERS = {
+    profile: "Paste the prospect's content here...",
+    assess: "Type 'start' to begin...",
+    coach: "e.g., 'I'm stuck at Discipline Level 3'"
+  };
+
+  let currentMode = 'profile';
+  let apiKey = null;
+  let useServer = false;
+  const history = { profile: [], assess: [], coach: [] };
+
+  const chatEl = document.getElementById('chat');
+  const inputEl = document.getElementById('input');
+  const sendBtn = document.getElementById('send');
+  const modal = document.getElementById('modal');
+  const statusBtn = document.getElementById('statusBtn');
+
+  async function detectServer() {
+    try {
+      const res = await fetch('/api/chat', { method: 'OPTIONS' });
+      return res.ok || res.status === 405;
+    } catch { return false; }
+  }
+
+  async function callClaude(systemPrompt, messages) {
+    if (useServer) {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ system: systemPrompt, messages })
+      });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const data = await res.json();
+      return data.reply;
+    }
+    if (!apiKey) throw new Error('No API key set');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1500,
+        system: systemPrompt,
+        messages
+      })
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Claude error ${res.status}: ${errText}`);
+    }
+    const data = await res.json();
+    return data.content[0].text;
+  }
+
+  function renderText(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  }
+
+  function addMsg(role, text, isTyping) {
+    const msg = document.createElement('div');
+    msg.className = 'msg ' + role;
+    const labels = {
+      user: ['YOU', 'You'],
+      bot: ['TP', 'The Profiler'],
+      system: ['!', 'System']
+    };
+    const [av, roleLabel] = labels[role] || labels.bot;
+    msg.innerHTML = `
+      <div class="msg-av">${av}</div>
+      <div class="msg-body">
+        <div class="msg-role">${roleLabel}</div>
+        <div class="msg-text">${isTyping ? '<span class="typing"><span></span><span></span><span></span></span>' : renderText(text)}</div>
+      </div>
+    `;
+    chatEl.appendChild(msg);
+    chatEl.scrollTop = chatEl.scrollHeight;
+    return msg;
+  }
+
+  function clearChat() { chatEl.innerHTML = ''; }
+
+  function renderIntro() {
+    clearChat();
+    history[currentMode].forEach(m => addMsg(m.role, m.text));
+    if (history[currentMode].length === 0) {
+      addMsg('bot', INTROS[currentMode]);
+    }
+    inputEl.placeholder = PLACEHOLDERS[currentMode];
+  }
+
+  function setConnected(connected, label) {
+    if (connected) {
+      statusBtn.className = 'status-badge live';
+      statusBtn.textContent = label || 'Live · connected';
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.placeholder = PLACEHOLDERS[currentMode];
+    } else {
+      statusBtn.className = 'status-badge setup';
+      statusBtn.textContent = 'Setup required';
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+      inputEl.placeholder = 'Click "Setup required" to connect...';
+    }
+  }
+
+  async function send() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    addMsg('user', text);
+    history[currentMode].push({ role: 'user', content: text });
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+    const typing = addMsg('bot', '', true);
+    try {
+      const messages = history[currentMode].map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content
+      }));
+      const reply = await callClaude(SYSTEM_PROMPTS[currentMode], messages);
+      typing.remove();
+      addMsg('bot', reply);
+      history[currentMode].push({ role: 'assistant', content: reply });
+    } catch (err) {
+      typing.remove();
+      addMsg('system', `Connection error: ${err.message}\n\nCheck your API key in Settings, or check the browser console.`);
+      console.error(err);
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  document.querySelectorAll('.mode').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.mode').forEach(m => m.classList.remove('active'));
+      el.classList.add('active');
+      currentMode = el.dataset.mode;
+      renderIntro();
+    });
+  });
+
+  function openModal() { modal.classList.add('open'); }
+  function closeModal() { modal.classList.remove('open'); }
+  statusBtn.addEventListener('click', openModal);
+  document.getElementById('setupBtn').addEventListener('click', openModal);
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  document.getElementById('saveKeyBtn').addEventListener('click', () => {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val.startsWith('sk-ant')) {
+      alert('That doesn\'t look like an Anthropic API key. They start with "sk-ant".');
+      return;
+    }
+    apiKey = val;
+    useServer = false;
+    setConnected(true, 'Live · browser key');
+    closeModal();
+  });
+
+  sendBtn.addEventListener('click', send);
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + 'px';
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('Reset this conversation?')) return;
+    history[currentMode] = [];
+    renderIntro();
+  });
+
+  async function init() {
+    renderIntro();
+    if (await detectServer()) {
+      useServer = true;
+      setConnected(true, 'Live · server');
+    } else {
+      setConnected(false);
+      setTimeout(openModal, 400);
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
