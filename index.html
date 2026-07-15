@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="BIL Suite">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="BIL Professional Suite — Field observation and behavioural intelligence tools.">
 <title>BIL Professional Suite</title>
@@ -63,6 +66,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 .loading.hide{display:none}
 .footer-note{margin-top:18px;font-size:12px;color:var(--muted);text-align:center}
 @media(max-width:900px){.grid,.grid-2{grid-template-columns:1fr}.card{min-height:200px}.home{padding-top:36px}}
+@media(max-width:760px){.grid,.grid-2{grid-template-columns:1fr}.card{min-height:190px}.topbar{position:sticky;top:0}.home{padding-left:14px;padding-right:14px}.security{font-size:12px}}
 @media(max-width:560px){.topbar{height:62px;padding:0 12px}.logo{width:38px;height:38px}.brand b{font-size:14px}.brand span{font-size:9px}.icon-btn{padding:0 11px;height:38px}#reloadBtn{display:none!important}.home{padding:28px 14px 32px}h1{font-size:34px}.lead{font-size:15px}}
 </style>
 </head>
@@ -124,6 +128,8 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
         <div class="grid-2">
           
           <article class="card profiler" data-tool="dashboard"><div class="num">04 / MANAGEMENT</div><div class="icon">▥</div><span class="badge bte">Manager view</span><h2>Manager Dashboard</h2><p>See case status, high-risk records, overdue reviews, Red events and case mix at a glance.</p><div class="open"><span>Open Dashboard</span><span>→</span></div></article>
+          <article class="card profiler" data-tool="government"><div class="num">05 / PRESENTATION</div><div class="icon">◆</div><span class="badge bte">Pilot briefing</span><h2>Government Demonstration</h2><p>Executive overview, safeguarded use case, pilot pathway, outcomes and evidence limitations for stakeholder presentations.</p><div class="open"><span>Open Demonstration</span><span>→</span></div></article>
+          <article class="card profiler" data-tool="governance"><div class="num">06 / GOVERNANCE</div><div class="icon">◇</div><span class="badge bte">Assurance</span><h2>Governance & Assurance</h2><p>Data handling, professional limitations, accessibility, security roadmap and requirements before operational deployment.</p><div class="open"><span>Open Assurance</span><span>→</span></div></article>
           <article class="card adult" data-tool="cases">
             <div class="num">04 / CASE MANAGEMENT</div>
             <div class="icon">▦</div>
@@ -145,7 +151,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
       <div class="security">
         <b>Data separation & safety:</b> Each tool keeps its own localStorage keys. Nothing leaves this device unless you copy/export. Field tools are immutable once saved. Always transfer safeguarding records into your agency system the same day, then clear. BTE and DRS raise questions — they never determine harm.
       </div>
-      <div class="footer-note">BIL Professional Suite · Version 2.6 · Modules 1–7 integrated</div>
+      <div class="footer-note">BIL Professional Suite · Version 2.7 · Government Presentation Build</div>
     </section>
 
     <section class="viewer" id="viewer">
@@ -156,7 +162,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 </div>
 
 <script>
-/* ========== BIL Professional Suite v2.6 ========== */
+/* ========== BIL Professional Suite v2.7 ========== */
 /* Tools are loaded from external files when available, otherwise from embedded base64.
    For single-file distribution the three field tools are embedded below. */
 
@@ -165,6 +171,8 @@ const META = {
   adult:   ['Adult Safeguarding Observation Log', 'Field · BTE + DRS · Care Act 2014'],
   da:      ['Domestic Abuse Observation Log', 'Field · BTE + DRS · DA Act 2021'],
   dashboard:['Manager Dashboard','Cases · Risk · Review queue'],
+  government:['Government Demonstration','Pilot · Outcomes · Decision support'],
+  governance:['Governance & Assurance','Data · Safety · Accessibility'],
   cases:   ['Case Workspace', 'Cases · Chronology · Local records'],
   profiler:['BIL Behaviour Engine', 'BTE · DRS · Five Cs · Human Needs']
 };
@@ -213,7 +221,7 @@ function loadEmbedded(id){
   if (id === 'profiler' || id === 'cases' || id === 'dashboard') {
     frame.onload = () => loading.classList.add('hide');
     frame.removeAttribute('srcdoc');
-    frame.src = id === 'cases' ? 'cases.html' : id === 'dashboard' ? 'dashboard.html' : 'profiler.html';
+    frame.src = id === 'cases' ? 'cases.html' : id === 'dashboard' ? 'dashboard.html' : id === 'government' ? 'government-demo.html' : id === 'governance' ? 'governance.html' : 'profiler.html';
     return;
   }
 
@@ -273,6 +281,7 @@ EMBEDDED.adult = decodeBase64Utf8(EMBEDDED_B64.adult);
 EMBEDDED.da    = decodeBase64Utf8(EMBEDDED_B64.da);
 
 // tools already loaded
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
 </script>
 </body>
 </html>

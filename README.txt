@@ -1,23 +1,28 @@
-BIL PROFESSIONAL SUITE v2.6 — MODULES 1–7
+BIL PROFESSIONAL SUITE v2.7 - GOVERNMENT PRESENTATION BUILD
 
-Upload to the development branch:
-- index.html
-- dashboard.html
-- cases.html
-- profiler.html
-- vercel.json
-- api/profile.js
+Upload all files to the development branch.
 
-Included:
-1. Behaviour Timeline Engine
-2. Expanded searchable BTE Library
-3. Automatic Behaviour Summary Engine
-4. Risk Engine with pressure index, evidence confidence, alerts and review prompts
-5. AI Behaviour Assistant for codes, questions, evidence gaps, summaries and communication strategy
-6. Manager Dashboard for case status, high risk, overdue reviews, Red events and case mix
-7. Professional Report Generator with manager, safeguarding, MARAC, chronology, behavioural, executive, timeline and risk reports
+New in this release:
+- Government Demonstration page
+- Governance & Assurance page
+- PWA manifest and service worker for phone/tablet installation
+- Responsive refinements for phone, tablet, laptop and desktop
+- Clear operational boundary: demonstration/controlled pilot, not yet an official case-management system
 
-IMPORTANT: This remains a local-first development build. Records stay in the browser on one device. It is not yet a shared council case-management system.
+Files:
+index.html
+cases.html
+dashboard.html
+profiler.html
+government-demo.html
+governance.html
+manifest.webmanifest
+icon.svg
+sw.js
+vercel.json
+api/profile.js
 
 Required Vercel environment variable:
 ANTHROPIC_API_KEY
+
+Before any live public-sector case use, complete identity, secure shared storage, audit logging, DPIA, accessibility testing, security assurance and service-specific professional review.
