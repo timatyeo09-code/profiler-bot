@@ -32,3 +32,12 @@ SECURITY
 
 OPERATIONAL BOUNDARY
 Version 4.0 is a cloud-ready technical foundation, not a government-accredited live case system. Formal deployment still requires DPIA, approved architecture, contracts, penetration testing, retention controls, accessibility testing, incident response and independent professional safety review.
+
+VERSION 4.0.1 PHONE-READY UPDATE
+- Shared mobile.css added to every standalone page.
+- Phone-safe input sizing prevents unwanted iPhone zoom.
+- Single-column layouts on narrow screens.
+- Full-width touch controls and safer spacing.
+- Fixed portal viewer sizing below the mobile header.
+- Long text, tables, reports and framework pills no longer overflow horizontally.
+- Service-worker cache version bumped so older mobile styling is replaced.

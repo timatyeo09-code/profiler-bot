@@ -1,0 +1,43 @@
+/* BIL Professional Suite v4.0.1 - shared phone and tablet hardening */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
+body{overflow-x:hidden;min-width:0}
+img,svg,canvas,video{max-width:100%;height:auto}
+button,input,select,textarea{max-width:100%}
+input,select,textarea{font-size:16px!important}
+button,.btn,.icon-btn{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+pre,code,.output,.lead,p,li,td,th{overflow-wrap:anywhere;word-break:normal}
+table{max-width:100%}
+@media(max-width:760px){
+  .wrap,.home{width:100%;max-width:100%;padding-left:12px!important;padding-right:12px!important;padding-bottom:calc(44px + env(safe-area-inset-bottom))!important}
+  .hero{display:block!important}
+  .hero>.btn,.hero .topbtn{width:100%;margin-top:12px;min-height:46px}
+  h1{font-size:clamp(30px,10vw,40px)!important;line-height:1.04!important}
+  h2{line-height:1.25}
+  .lead{font-size:15px;line-height:1.55}
+  .grid,.grid-2,.metrics,.summary-grid,.row,.row3,.library-tools{grid-template-columns:minmax(0,1fr)!important}
+  .card,.metric,.step{min-width:0;padding:14px!important}
+  .actions{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
+  .actions .btn,.btn.primary,.btn.secondary{width:100%;min-height:46px}
+  .topbar{padding-left:10px!important;padding-right:10px!important;gap:8px!important}
+  .top-actions{gap:6px!important}
+  .brand{max-width:calc(100vw - 150px)}
+  .brand b,.brand span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .viewer{position:fixed!important;top:62px!important;right:0!important;bottom:0!important;left:0!important}
+  iframe{min-height:calc(100dvh - 62px)}
+  .case,.member{min-width:0}
+  .case{grid-template-columns:1fr!important;gap:6px!important}
+  .step{grid-template-columns:44px minmax(0,1fr)!important;gap:10px!important}
+  .step .tag{grid-column:2!important;justify-self:start}
+  .bars .row,.bar-row{grid-template-columns:82px minmax(0,1fr) 30px!important}
+  .wide{grid-column:auto!important}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .output{min-height:280px!important;max-height:none!important}
+}
+@media(max-width:420px){
+  .logo{flex:0 0 auto}
+  .icon-btn{padding:0 10px!important}
+  #reloadBtn{display:none!important}
+  .metrics{grid-template-columns:1fr!important}
+  .frameworks{display:flex;overflow-x:auto;flex-wrap:nowrap!important;padding-bottom:6px;scroll-snap-type:x proximity}
+  .frameworks .pill{white-space:nowrap;scroll-snap-align:start}
+}
