@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest">
 <meta name="description" content="BIL Professional Suite — Field observation and behavioural intelligence tools.">
 <title>BIL Professional Suite</title>
 <style>
@@ -35,7 +33,6 @@ main{flex:1;min-height:0;position:relative}
 .kicker{color:var(--cyan);font-weight:800;font-size:12px;letter-spacing:.17em;text-transform:uppercase}
 h1{font-size:clamp(32px,5.5vw,58px);line-height:.98;letter-spacing:-.055em;margin:12px 0 14px;max-width:860px}
 .lead{color:var(--muted);font-size:16.5px;line-height:1.65;max-width:720px;margin:0 0 36px}
-.trust-row{display:flex;flex-wrap:wrap;gap:8px;margin:-18px 0 34px}.trust-row span{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(97,183,255,.25);background:rgba(97,183,255,.05);padding:7px 10px;border-radius:999px}
 .section{margin-bottom:36px}
 .section-title{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
 .section-title::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.08)}
@@ -53,7 +50,7 @@ h1{font-size:clamp(32px,5.5vw,58px);line-height:.98;letter-spacing:-.055em;margi
 .card.field{--glow:#54c987}.card.field .open{color:var(--green)}
 .card.adult{--glow:#61b7ff}.card.adult .open{color:var(--cyan)}
 .card.da{--glow:#ff6c7a}.card.da .open{color:var(--danger)}
-.card.profiler{--glow:#61b7ff}.card.cases{--glow:#f4bd45}.card.cases .open{color:var(--gold)}
+.card.profiler{--glow:#61b7ff}
 .badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:99px;margin-bottom:8px}
 .badge.bte{background:rgba(84,201,135,.15);color:var(--green);border:1px solid rgba(84,201,135,.35)}
 .badge.drs{background:rgba(255,108,122,.12);color:var(--danger);border:1px solid rgba(255,108,122,.3)}
@@ -66,7 +63,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 .loading.hide{display:none}
 .footer-note{margin-top:18px;font-size:12px;color:var(--muted);text-align:center}
 @media(max-width:900px){.grid,.grid-2{grid-template-columns:1fr}.card{min-height:200px}.home{padding-top:36px}}
-@media(max-width:560px){.trust-row{margin-top:-12px}.topbar{height:62px;padding:0 12px}.logo{width:38px;height:38px}.brand b{font-size:14px}.brand span{font-size:9px}.icon-btn{padding:0 11px;height:38px}#reloadBtn{display:none!important}.home{padding:28px 14px 32px}h1{font-size:34px}.lead{font-size:15px}}
+@media(max-width:560px){.topbar{height:62px;padding:0 12px}.logo{width:38px;height:38px}.brand b{font-size:14px}.brand span{font-size:9px}.icon-btn{padding:0 11px;height:38px}#reloadBtn{display:none!important}.home{padding:28px 14px 32px}h1{font-size:34px}.lead{font-size:15px}}
 </style>
 </head>
 <body>
@@ -75,7 +72,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
     <div class="logo">BIL</div>
     <div class="brand">
       <b id="pageTitle">BIL Professional Suite</b>
-      <span id="pageSub">Observation · Analysis · Decision Support</span>
+      <span id="pageSub">Field Observation Suite · Analysis</span>
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="homeBtn" type="button">← Home</button>
@@ -87,8 +84,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
     <section class="home" id="home">
       <div class="kicker">Behavioural Intelligence Lab</div>
       <h1>Professional behavioural intelligence for high-stakes decisions.</h1>
-      <p class="lead">Structured field observation, safeguarding records and calibrated behavioural analysis—built around BTE, DRS, the Four States and the Five Cs.</p>
-      <div class="trust-row"><span>Local-first field records</span><span>Evidence before opinion</span><span>Professional decision support</span></div>
+      <p class="lead">Structured observation, safeguarding records, case chronology and calibrated behavioural analysis—built around BTE, DRS, the Four States and the Five Cs.</p>
 
       <!-- FIELD SUITE -->
       <div class="section">
@@ -126,11 +122,13 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
       <div class="section">
         <div class="section-title">Behavioural Analysis</div>
         <div class="grid-2">
-          <article class="card cases" data-tool="cases">
-            <div class="num">04 / CASES</div>
-            <div class="icon">▣</div>
+          
+          <article class="card adult" data-tool="cases">
+            <div class="num">04 / CASE MANAGEMENT</div>
+            <div class="icon">▦</div>
+            <span class="badge bte">Local-first</span>
             <h2>Case Workspace</h2>
-            <p>Create, search and reopen local case records with references, status, notes and a simple chronology.</p>
+            <p>Create cases, search records, build a chronology, track status and risk, and export structured case data.</p>
             <div class="open"><span>Open Case Workspace</span><span>→</span></div>
           </article>
           <article class="card profiler" data-tool="profiler">
@@ -146,7 +144,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
       <div class="security">
         <b>Data separation & safety:</b> Each tool keeps its own localStorage keys. Nothing leaves this device unless you copy/export. Field tools are immutable once saved. Always transfer safeguarding records into your agency system the same day, then clear. BTE and DRS raise questions — they never determine harm.
       </div>
-      <div class="footer-note">BIL Professional Suite · Version 1.1 · Schema 2026-07</div>
+      <div class="footer-note">BIL Professional Suite · Version 1.2 · Local-first case workspace</div>
     </section>
 
     <section class="viewer" id="viewer">
@@ -157,7 +155,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 </div>
 
 <script>
-/* ========== BIL Professional Suite v1 ========== */
+/* ========== BIL Professional Suite v1.2 ========== */
 /* Tools are loaded from external files when available, otherwise from embedded base64.
    For single-file distribution the three field tools are embedded below. */
 
@@ -165,7 +163,7 @@ const META = {
   child:   ['Child Welfare Observation Log', 'Field · BTE + DRS · Children Act'],
   adult:   ['Adult Safeguarding Observation Log', 'Field · BTE + DRS · Care Act 2014'],
   da:      ['Domestic Abuse Observation Log', 'Field · BTE + DRS · DA Act 2021'],
-  cases:   ['Case Workspace', 'Local cases · Search · Chronology'],
+  cases:   ['Case Workspace', 'Cases · Chronology · Local records'],
   profiler:['BIL Behaviour Engine', 'BTE · DRS · Five Cs · Human Needs']
 };
 
@@ -174,7 +172,7 @@ const FILE_PATHS = {
   child:   'BIL_Child_Welfare_Observation_Log_v3_BTE.html',
   adult:   'BIL_Adult_Safeguarding_Observation_Log_v2_BTE.html',
   da:      'BIL_Domestic_Abuse_Observation_Log_v2_BTE.html',
-  cases:null,
+  cases:    null,
   profiler:null
 };
 
@@ -212,7 +210,7 @@ function loadEmbedded(id){
   if (id === 'profiler' || id === 'cases') {
     frame.onload = () => loading.classList.add('hide');
     frame.removeAttribute('srcdoc');
-    frame.src = id === 'profiler' ? 'profiler.html' : 'cases.html';
+    frame.src = id === 'cases' ? 'cases.html' : 'profiler.html';
     return;
   }
 
@@ -237,7 +235,7 @@ function goHome(){
   homeBtn.style.display = 'none';
   reloadBtn.style.display = 'none';
   pageTitle.textContent = 'BIL Professional Suite';
-  pageSub.textContent = 'Observation · Analysis · Decision Support';
+  pageSub.textContent = 'Field Observation Suite · Analysis';
   history.replaceState(null,'',location.pathname + location.search);
 }
 
@@ -272,8 +270,6 @@ EMBEDDED.adult = decodeBase64Utf8(EMBEDDED_B64.adult);
 EMBEDDED.da    = decodeBase64Utf8(EMBEDDED_B64.da);
 
 // tools already loaded
-
-if ('serviceWorker' in navigator) { window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{})); }
 </script>
 </body>
 </html>
