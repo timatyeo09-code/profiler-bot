@@ -123,6 +123,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
         <div class="section-title">Behavioural Analysis</div>
         <div class="grid-2">
           
+          <article class="card profiler" data-tool="dashboard"><div class="num">04 / MANAGEMENT</div><div class="icon">▥</div><span class="badge bte">Manager view</span><h2>Manager Dashboard</h2><p>See case status, high-risk records, overdue reviews, Red events and case mix at a glance.</p><div class="open"><span>Open Dashboard</span><span>→</span></div></article>
           <article class="card adult" data-tool="cases">
             <div class="num">04 / CASE MANAGEMENT</div>
             <div class="icon">▦</div>
@@ -144,7 +145,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
       <div class="security">
         <b>Data separation & safety:</b> Each tool keeps its own localStorage keys. Nothing leaves this device unless you copy/export. Field tools are immutable once saved. Always transfer safeguarding records into your agency system the same day, then clear. BTE and DRS raise questions — they never determine harm.
       </div>
-      <div class="footer-note">BIL Professional Suite · Version 1.2 · Local-first case workspace</div>
+      <div class="footer-note">BIL Professional Suite · Version 2.6 · Modules 1–7 integrated</div>
     </section>
 
     <section class="viewer" id="viewer">
@@ -155,7 +156,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 </div>
 
 <script>
-/* ========== BIL Professional Suite v1.2 ========== */
+/* ========== BIL Professional Suite v2.6 ========== */
 /* Tools are loaded from external files when available, otherwise from embedded base64.
    For single-file distribution the three field tools are embedded below. */
 
@@ -163,6 +164,7 @@ const META = {
   child:   ['Child Welfare Observation Log', 'Field · BTE + DRS · Children Act'],
   adult:   ['Adult Safeguarding Observation Log', 'Field · BTE + DRS · Care Act 2014'],
   da:      ['Domestic Abuse Observation Log', 'Field · BTE + DRS · DA Act 2021'],
+  dashboard:['Manager Dashboard','Cases · Risk · Review queue'],
   cases:   ['Case Workspace', 'Cases · Chronology · Local records'],
   profiler:['BIL Behaviour Engine', 'BTE · DRS · Five Cs · Human Needs']
 };
@@ -172,6 +174,7 @@ const FILE_PATHS = {
   child:   'BIL_Child_Welfare_Observation_Log_v3_BTE.html',
   adult:   'BIL_Adult_Safeguarding_Observation_Log_v2_BTE.html',
   da:      'BIL_Domestic_Abuse_Observation_Log_v2_BTE.html',
+  dashboard:null,
   cases:    null,
   profiler:null
 };
@@ -207,10 +210,10 @@ function openTool(id){
 
 function loadEmbedded(id){
   // The Profiler is a separate page so its JavaScript cannot break the portal shell.
-  if (id === 'profiler' || id === 'cases') {
+  if (id === 'profiler' || id === 'cases' || id === 'dashboard') {
     frame.onload = () => loading.classList.add('hide');
     frame.removeAttribute('srcdoc');
-    frame.src = id === 'cases' ? 'cases.html' : 'profiler.html';
+    frame.src = id === 'cases' ? 'cases.html' : id === 'dashboard' ? 'dashboard.html' : 'profiler.html';
     return;
   }
 

@@ -1,35 +1,23 @@
-BIL PROFESSIONAL SUITE v2.0.0 - MILESTONE 1
+BIL PROFESSIONAL SUITE v2.6 — MODULES 1–7
 
-Upload these items to the ROOT of the development branch:
+Upload to the development branch:
 - index.html
-- profiler.html
+- dashboard.html
 - cases.html
+- profiler.html
 - vercel.json
 - api/profile.js
 
-MILESTONE 1 INCLUDES
+Included:
 1. Behaviour Timeline Engine
-   - Four-State timeline events
-   - chronological sorting
-   - state and event filters
-   - visual pressure trend
-   - BTE-linked event scoring
-
-2. Expanded BTE Library
-   - 100+ verbal and non-verbal BTE cells
-   - searchable by code, name or body region
-   - body-region filtering
-   - click-to-select behaviours
-   - DRS values and categories
-
+2. Expanded searchable BTE Library
 3. Automatic Behaviour Summary Engine
-   - frequency analysis
-   - Four-State distribution
-   - repeated-cue ranking
-   - automatic escalation observations
-   - report integration
+4. Risk Engine with pressure index, evidence confidence, alerts and review prompts
+5. AI Behaviour Assistant for codes, questions, evidence gaps, summaries and communication strategy
+6. Manager Dashboard for case status, high risk, overdue reviews, Red events and case mix
+7. Professional Report Generator with manager, safeguarding, MARAC, chronology, behavioural, executive, timeline and risk reports
+
+IMPORTANT: This remains a local-first development build. Records stay in the browser on one device. It is not yet a shared council case-management system.
 
 Required Vercel environment variable:
 ANTHROPIC_API_KEY
-
-This build remains local-first. It is suitable for development and controlled testing, not as the sole official case record.
