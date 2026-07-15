@@ -19,6 +19,7 @@ export default async function handler(req, res) {
   const subject = String(body.subject || '').trim();
   const content = String(body.content || '').trim();
   const goal = String(body.goal || '').trim();
+  const wantStream = body.stream === true;
 
   if (!content) {
     return res.status(400).json({ error: 'Please provide observations, notes or a transcript.' });
@@ -31,10 +32,76 @@ export default async function handler(req, res) {
 
   const prompt = `REPORT TYPE: ${mode}\nCONTEXT: ${context}\nSUBJECT / REFERENCE: ${subject || 'Not supplied'}\nREQUIRED OUTCOME: ${goal || 'Not supplied'}\n\nSOURCE MATERIAL:\n${content}\n\nReturn a focused professional report using these headings:\n1. Executive Summary\n2. Observable Evidence\n3. Behavioural Changes and Clusters\n4. Alternative Explanations\n5. Working Hypotheses to Test\n6. Questions to Ask Next\n7. Communication Strategy\n8. Risks, Limits and Safeguards\n9. Recommended Next Actions\n\nOnly reference evidence present in the source material. Clearly distinguish evidence from inference. Keep the report practical and concise.`;
 
+  const anthropicPayload = {
+    model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6',
+    max_tokens: 1800,
+    temperature: 0.2,
+    system,
+    messages: [{ role: 'user', content: prompt }]
+  };
+
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45000);
+  const timeout = setTimeout(() => controller.abort(), 50000);
 
   try {
+    /* ---- STREAMING PATH (profiler.html sends stream:true) ----
+       First words reach the screen in a couple of seconds instead of
+       a long blank wait. Any failure before the stream starts returns
+       normal JSON so the client can fall back cleanly. */
+    if (wantStream) {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({ ...anthropicPayload, stream: true })
+      });
+
+      if (!response.ok || !response.body) {
+        const data = await response.json().catch(() => ({}));
+        return res.status(response.status || 502).json({
+          error: data?.error?.message || `Anthropic returned HTTP ${response.status}.`
+        });
+      }
+
+      res.writeHead(200, {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'X-Accel-Buffering': 'no'
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const raw = line.slice(6).trim();
+            if (!raw || raw === '[DONE]') continue;
+            try {
+              const evt = JSON.parse(raw);
+              if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta' && evt.delta.text) {
+                res.write(evt.delta.text);
+              }
+            } catch { /* ignore malformed keep-alive lines */ }
+          }
+        }
+      } catch {
+        res.write('\n\n[The connection was interrupted. The report above may be incomplete — run the analysis again if needed.]');
+      }
+      return res.end();
+    }
+
+    /* ---- STANDARD JSON PATH (Case Workspace assistant + analysis, unchanged contract) ---- */
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       signal: controller.signal,
@@ -43,13 +110,7 @@ export default async function handler(req, res) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
-        max_tokens: 1800,
-        temperature: 0.2,
-        system,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      body: JSON.stringify(anthropicPayload)
     });
 
     const data = await response.json().catch(() => ({}));
@@ -67,10 +128,10 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'Anthropic returned an empty report. Please try again.' });
     }
 
-    return res.status(200).json({ result, model: data.model || 'Configured Anthropic model' });
+    return res.status(200).json({ result, model: data.model || 'Configured Anthropic model', usage: data.usage || null });
   } catch (error) {
     if (error?.name === 'AbortError') {
-      return res.status(504).json({ error: 'The analysis exceeded 45 seconds. Try a shorter observation.' });
+      return res.status(504).json({ error: 'The analysis exceeded the time limit. Try a shorter observation.' });
     }
     console.error('Profile function error', error);
     return res.status(500).json({ error: 'The server could not reach Anthropic. Check the Vercel logs and try again.' });
