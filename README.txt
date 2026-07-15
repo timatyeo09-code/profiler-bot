@@ -1,4 +1,4 @@
-BIL PROFESSIONAL SUITE v3.0 - PRESENTATION EDITION
+BIL PROFESSIONAL SUITE v3.0 - PROFESSIONAL SUITE v3.0
 
 PURPOSE
 A complete presentation and controlled-pilot build for stakeholder demonstrations tonight.
@@ -41,7 +41,7 @@ REQUIRED VERCEL ENVIRONMENT VARIABLE
 ANTHROPIC_API_KEY
 
 OPTIONAL
-ANTHROPIC_MODEL=claude-sonnet-4-5
+ANTHROPIC_MODEL=claude-sonnet-4-6
 
 IMPORTANT OPERATIONAL BOUNDARY
 This is a presentation and controlled-pilot product. It is not government-approved, accredited,

@@ -76,7 +76,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
     <div class="logo">BIL</div>
     <div class="brand">
       <b id="pageTitle">BIL Professional Suite</b>
-      <span id="pageSub">Professional Decision Support · Presentation Edition</span>
+      <span id="pageSub">Professional Decision Support · v3.0</span>
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="homeBtn" type="button">← Home</button>
@@ -159,7 +159,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
       <div class="security">
         <b>Data separation & safety:</b> Each tool keeps its own localStorage keys. Nothing leaves this device unless you copy/export. Field tools are immutable once saved. Always transfer safeguarding records into your agency system the same day, then clear. BTE and DRS raise questions — they never determine harm.
       </div>
-      <div class="footer-note">BIL Professional Suite · Version 2.7 · Government Presentation Build</div>
+      <div class="footer-note">BIL Professional Suite · Version 3.0 · Professional Build</div>
     </section>
 
     <section class="viewer" id="viewer">
@@ -170,7 +170,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 </div>
 
 <script>
-/* ========== BIL Professional Suite v2.7 ========== */
+/* ========== BIL Professional Suite v3.0 ========== */
 /* Tools are loaded from external files when available, otherwise from embedded base64.
    For single-file distribution the three field tools are embedded below. */
 
@@ -226,12 +226,22 @@ function openTool(id){
   loadEmbedded(id);
 }
 
+const PAGES = {
+  dashboard: 'dashboard.html',
+  government: 'government-demo.html',
+  governance: 'governance.html',
+  cases: 'cases.html',
+  profiler: 'profiler.html',
+  guided: 'guided-demo.html',
+  brief: 'product-brief.html'
+};
+
 function loadEmbedded(id){
-  // The Profiler is a separate page so its JavaScript cannot break the portal shell.
-  if (id === 'profiler' || id === 'cases' || id === 'dashboard') {
+  // Standalone pages use normal URLs. Field tools remain embedded for offline reliability.
+  if (PAGES[id]) {
     frame.onload = () => loading.classList.add('hide');
     frame.removeAttribute('srcdoc');
-    frame.src = id === 'cases' ? 'cases.html' : id === 'dashboard' ? 'dashboard.html' : id === 'government' ? 'government-demo.html' : id === 'governance' ? 'governance.html' : id === 'guided' ? 'guided-demo.html' : id === 'brief' ? 'product-brief.html' : 'profiler.html';
+    frame.src = PAGES[id];
     return;
   }
 
@@ -239,14 +249,13 @@ function loadEmbedded(id){
     frame.onload = () => loading.classList.add('hide');
     frame.src = 'about:blank';
     frame.srcdoc = EMBEDDED[id];
-  } else {
-    const placeholders = {};
-    frame.onload = () => loading.classList.add('hide');
-    frame.src = 'about:blank';
-    frame.srcdoc = placeholders[id] || '<p style="padding:40px;font-family:system-ui">Tool not available.</p>';
+    return;
   }
-}
 
+  frame.onload = () => loading.classList.add('hide');
+  frame.src = 'about:blank';
+  frame.srcdoc = '<p style="padding:40px;font-family:system-ui">Tool not available.</p>';
+}
 function goHome(){
   activeTool = null;
   frame.removeAttribute('srcdoc');
@@ -256,7 +265,7 @@ function goHome(){
   homeBtn.style.display = 'none';
   reloadBtn.style.display = 'none';
   pageTitle.textContent = 'BIL Professional Suite';
-  pageSub.textContent = 'Professional Decision Support · Presentation Edition';
+  pageSub.textContent = 'Professional Decision Support · v3.0';
   history.replaceState(null,'',location.pathname + location.search);
 }
 
