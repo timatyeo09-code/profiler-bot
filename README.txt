@@ -1,23 +1,36 @@
-BIL PROFESSIONAL SUITE - CLEAN RESET v1.0
+BIL PROFESSIONAL SUITE v3.1 - INTEGRATED BUILD
 
-UPLOAD TO THE GITHUB REPOSITORY ROOT
+UPLOAD ALL ITEMS TO THE ROOT OF YOUR GITHUB REPOSITORY:
 - index.html
+- cases.html
+- dashboard.html
 - profiler.html
+- government-demo.html
+- governance.html
+- guided-demo.html
+- product-brief.html
+- manifest.webmanifest
+- icon.svg
+- sw.js
 - vercel.json
-- README.txt
-- api/profile.js  (profile.js must remain inside the api folder)
+- api/profile.js  (keep profile.js inside the api folder)
 
 VERCEL ENVIRONMENT VARIABLES
-Required:
-ANTHROPIC_API_KEY
+Required: ANTHROPIC_API_KEY
+Optional: ANTHROPIC_MODEL
 
-Optional:
-ANTHROPIC_MODEL
+WHAT IS INCLUDED
+- Child Welfare Observation Log
+- Adult Safeguarding Observation Log
+- Domestic Abuse Observation Log
+- Case Workspace and chronology
+- Manager Dashboard
+- BIL Behaviour Engine
+- Governance and assurance page
+- Government demonstration page
+- Guided stakeholder presentation
+- Executive product brief
+- PWA/mobile install support
 
 IMPORTANT
-- Do not add Next.js configuration files.
-- Do not add a catch-all rewrite to vercel.json.
-- The three field tools are embedded inside index.html.
-- The Week Journal has been removed.
-- The interface is responsive for phones, tablets, laptops and desktops.
-- Use fictional or minimised data until formal security and governance controls are implemented.
+This build stores records in the browser on the current device. Use fictional or minimised data until secure authentication, shared encrypted storage, central audit logging, retention controls and formal assurance are implemented.
