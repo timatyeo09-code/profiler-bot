@@ -1,19 +1,20 @@
-BIL PROFESSIONAL SUITE — VERSION 1.0 FOUNDATION
+BIL PROFESSIONAL SUITE V1.1 - MOBILE + LOCAL CASES
 
-Upload these items to the ROOT of the GitHub repository:
+Upload these items to the ROOT of GitHub:
 - index.html
 - profiler.html
+- cases.html
+- manifest.webmanifest
+- icon.svg
+- sw.js
 - vercel.json
 - api/profile.js
 
-Version 1.0 foundation changes:
-- Removed all visible “Portal” branding.
-- Main product renamed BIL Professional Suite.
-- Homepage repositioned around professional behavioural intelligence and decision support.
-- Week Journal remains removed.
-- Child Welfare, Adult Safeguarding and Domestic Abuse tools preserved.
-- BIL Behaviour Engine and secure Anthropic endpoint preserved.
-- Version label updated to 1.0.
+New in V1.1:
+- Installable mobile Progressive Web App.
+- Improved mobile tap targets and standalone mode.
+- Local Case Workspace with search, status, summaries and chronology.
+- Existing field logs and BIL Behaviour Engine preserved.
 
 Required Vercel environment variable:
 ANTHROPIC_API_KEY
