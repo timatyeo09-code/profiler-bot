@@ -1,27 +1,34 @@
-BIL PROFESSIONAL SUITE v3.5 - COMPLETE VERSIONS 3.2 TO 3.5
+BIL PROFESSIONAL SUITE v4.0 - CLOUD-READY FOUNDATION
 
-ADDED IN v3.2
-- Automatic case reference generation
-- Auto-save for existing case overview fields
-- Search and recent-case ordering
-- Timestamped case notes
-- Local file and photo attachments up to 2 MB
-- Document references and download/open controls
+WHAT IS INCLUDED
+- All v3.2-v3.5 case, timeline, dashboard, behaviour-engine and governance modules
+- Secure Access & Cloud Sync page
+- Supabase email/password authentication integration
+- Manual upload/download of local case records
+- Database schema with profiles, organisations, cases and audit log
+- Row Level Security starter policies
+- Local-first mode remains available when cloud is not configured
 
-ADDED IN v3.3
-- Visual chronology and Four-State timeline
-- Timeline filters and behavioural-pressure trend
+UPLOAD ALL FILES TO THE GITHUB ROOT
+Keep folders intact:
+- api/profile.js
+- js/bil-cloud.js
+- supabase/schema.sql
 
-ADDED IN v3.4
-- BIL Behaviour Engine 2.0
-- Four States, Five Cs, BTE, DRS, Human Needs and Behaviour Compass prompts
+TO ACTIVATE CLOUD MODE
+1. Create a Supabase project.
+2. Open Supabase SQL Editor and run supabase/schema.sql.
+3. In Supabase Authentication, configure your approved sign-in settings.
+4. Edit config.js and enter:
+   supabaseUrl: 'https://YOUR-PROJECT.supabase.co'
+   supabaseAnonKey: 'YOUR-ANON-PUBLIC-KEY'
+5. Commit and redeploy.
+6. Open Accounts & Cloud Sync, create an account and test with fictional data.
 
-ADDED IN v3.5
-- Supervisor approval workflow
-- Local audit trail and exports
-- Manager dashboard and organisation settings
-- Governance, government demonstration and executive brief
+SECURITY
+- The anon key is designed for browser use and is protected by Row Level Security.
+- Never expose the Supabase service-role key.
+- The included policies initially isolate cases by user. Organisation-wide sharing should only be enabled after roles and governance are agreed.
 
-UPLOAD ALL FILES TO THE GITHUB ROOT. KEEP api/profile.js INSIDE THE api FOLDER.
-
-This remains a local-first operational prototype. Live public-sector deployment requires secure authentication, shared encrypted storage, server-side audit logging, DPIA, accessibility and security assurance.
+OPERATIONAL BOUNDARY
+Version 4.0 is a cloud-ready technical foundation, not a government-accredited live case system. Formal deployment still requires DPIA, approved architecture, contracts, penetration testing, retention controls, accessibility testing, incident response and independent professional safety review.
