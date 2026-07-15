@@ -1,0 +1,16 @@
+BIL PROFESSIONAL SUITE - TONIGHT DEMO CHECKLIST
+
+1. Upload the full build to the development branch.
+2. Wait for Vercel status: Ready.
+3. Hard refresh the preview link.
+4. Confirm Governance & Assurance opens.
+5. Confirm Guided Presentation opens.
+6. Confirm Executive Product Brief opens.
+7. Create one fictional case only (for example BIL-DEMO-001).
+8. Add Green, Amber and Red events with fictional notes.
+9. Open Behaviour Summary and Risk.
+10. Run AI analysis using fictional/minimised content.
+11. Generate a report and Print/Save as PDF.
+12. Open the product on a phone and a laptop.
+13. Use the public production link only after the development build is approved and merged.
+14. State clearly: presentation/controlled-pilot edition, not an approved statutory system.

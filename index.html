@@ -76,7 +76,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
     <div class="logo">BIL</div>
     <div class="brand">
       <b id="pageTitle">BIL Professional Suite</b>
-      <span id="pageSub">Field Observation Suite · Analysis</span>
+      <span id="pageSub">Professional Decision Support · Presentation Edition</span>
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="homeBtn" type="button">← Home</button>
@@ -131,7 +131,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
           <article class="card profiler" data-tool="government"><div class="num">05 / PRESENTATION</div><div class="icon">◆</div><span class="badge bte">Pilot briefing</span><h2>Government Demonstration</h2><p>Executive overview, safeguarded use case, pilot pathway, outcomes and evidence limitations for stakeholder presentations.</p><div class="open"><span>Open Demonstration</span><span>→</span></div></article>
           <article class="card profiler" data-tool="governance"><div class="num">06 / GOVERNANCE</div><div class="icon">◇</div><span class="badge bte">Assurance</span><h2>Governance & Assurance</h2><p>Data handling, professional limitations, accessibility, security roadmap and requirements before operational deployment.</p><div class="open"><span>Open Assurance</span><span>→</span></div></article>
           <article class="card adult" data-tool="cases">
-            <div class="num">04 / CASE MANAGEMENT</div>
+            <div class="num">07 / CASE MANAGEMENT</div>
             <div class="icon">▦</div>
             <span class="badge bte">Local-first</span>
             <h2>Case Workspace</h2>
@@ -139,12 +139,20 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
             <div class="open"><span>Open Case Workspace</span><span>→</span></div>
           </article>
           <article class="card profiler" data-tool="profiler">
-            <div class="num">05 / ANALYSIS</div>
+            <div class="num">08 / ANALYSIS</div>
             <div class="icon">⌁</div>
             <h2>BIL Behaviour Engine</h2>
             <p>Analyse observations and transcripts through BTE, DRS, Four States, Five Cs, Human Needs and BIL professional standards.</p>
             <div class="open"><span>Open Behaviour Engine</span><span>→</span></div>
           </article>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Presentation & Product</div>
+        <div class="grid-2">
+          <article class="card profiler" data-tool="guided"><div class="num">09 / GUIDED DEMO</div><div class="icon">▶</div><span class="badge bte">Tonight-ready</span><h2>Guided Presentation</h2><p>A structured walkthrough for stakeholder meetings: problem, platform, live workflow, safeguards, pilot and next decision.</p><div class="open"><span>Start Guided Demo</span><span>→</span></div></article>
+          <article class="card adult" data-tool="brief"><div class="num">10 / EXECUTIVE BRIEF</div><div class="icon">▤</div><span class="badge bte">One-page proposition</span><h2>Executive Product Brief</h2><p>The value proposition, intended users, current capabilities, pilot offer, outcomes and transparent operational boundary.</p><div class="open"><span>Open Product Brief</span><span>→</span></div></article>
         </div>
       </div>
 
@@ -173,6 +181,8 @@ const META = {
   dashboard:['Manager Dashboard','Cases · Risk · Review queue'],
   government:['Government Demonstration','Pilot · Outcomes · Decision support'],
   governance:['Governance & Assurance','Data · Safety · Accessibility'],
+  guided:['Guided Presentation','Stakeholder walkthrough · Live demo'],
+  brief:['Executive Product Brief','Value · Pilot · Outcomes'],
   cases:   ['Case Workspace', 'Cases · Chronology · Local records'],
   profiler:['BIL Behaviour Engine', 'BTE · DRS · Five Cs · Human Needs']
 };
@@ -221,7 +231,7 @@ function loadEmbedded(id){
   if (id === 'profiler' || id === 'cases' || id === 'dashboard') {
     frame.onload = () => loading.classList.add('hide');
     frame.removeAttribute('srcdoc');
-    frame.src = id === 'cases' ? 'cases.html' : id === 'dashboard' ? 'dashboard.html' : id === 'government' ? 'government-demo.html' : id === 'governance' ? 'governance.html' : 'profiler.html';
+    frame.src = id === 'cases' ? 'cases.html' : id === 'dashboard' ? 'dashboard.html' : id === 'government' ? 'government-demo.html' : id === 'governance' ? 'governance.html' : id === 'guided' ? 'guided-demo.html' : id === 'brief' ? 'product-brief.html' : 'profiler.html';
     return;
   }
 
@@ -246,7 +256,7 @@ function goHome(){
   homeBtn.style.display = 'none';
   reloadBtn.style.display = 'none';
   pageTitle.textContent = 'BIL Professional Suite';
-  pageSub.textContent = 'Field Observation Suite · Analysis';
+  pageSub.textContent = 'Professional Decision Support · Presentation Edition';
   history.replaceState(null,'',location.pathname + location.search);
 }
 
