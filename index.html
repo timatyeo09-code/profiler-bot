@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="BIL Intelligence Portal — Field observation suite, performance journal and behavioural profiler.">
-<title>BIL Intelligence Portal</title>
+<meta name="description" content="BIL Professional Suite — Field observation and behavioural intelligence tools.">
+<title>BIL Professional Suite</title>
 <style>
 :root{
   --bg:#07111f; --panel:#0e1b2e; --panel2:#13243c; --line:#24405f;
@@ -33,6 +33,7 @@ main{flex:1;min-height:0;position:relative}
 .kicker{color:var(--cyan);font-weight:800;font-size:12px;letter-spacing:.17em;text-transform:uppercase}
 h1{font-size:clamp(32px,5.5vw,58px);line-height:.98;letter-spacing:-.055em;margin:12px 0 14px;max-width:860px}
 .lead{color:var(--muted);font-size:16.5px;line-height:1.65;max-width:720px;margin:0 0 36px}
+.trust-row{display:flex;flex-wrap:wrap;gap:8px;margin:-18px 0 34px}.trust-row span{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan);border:1px solid rgba(97,183,255,.25);background:rgba(97,183,255,.05);padding:7px 10px;border-radius:999px}
 .section{margin-bottom:36px}
 .section-title{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
 .section-title::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.08)}
@@ -50,7 +51,6 @@ h1{font-size:clamp(32px,5.5vw,58px);line-height:.98;letter-spacing:-.055em;margi
 .card.field{--glow:#54c987}.card.field .open{color:var(--green)}
 .card.adult{--glow:#61b7ff}.card.adult .open{color:var(--cyan)}
 .card.da{--glow:#ff6c7a}.card.da .open{color:var(--danger)}
-.card.journal{--glow:#f4bd45}.card.journal .open{color:var(--gold)}
 .card.profiler{--glow:#61b7ff}
 .badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:99px;margin-bottom:8px}
 .badge.bte{background:rgba(84,201,135,.15);color:var(--green);border:1px solid rgba(84,201,135,.35)}
@@ -64,7 +64,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 .loading.hide{display:none}
 .footer-note{margin-top:18px;font-size:12px;color:var(--muted);text-align:center}
 @media(max-width:900px){.grid,.grid-2{grid-template-columns:1fr}.card{min-height:200px}.home{padding-top:36px}}
-@media(max-width:560px){.topbar{height:62px;padding:0 12px}.logo{width:38px;height:38px}.brand b{font-size:14px}.brand span{font-size:9px}.icon-btn{padding:0 11px;height:38px}#reloadBtn{display:none!important}.home{padding:28px 14px 32px}h1{font-size:34px}.lead{font-size:15px}}
+@media(max-width:560px){.trust-row{margin-top:-12px}.topbar{height:62px;padding:0 12px}.logo{width:38px;height:38px}.brand b{font-size:14px}.brand span{font-size:9px}.icon-btn{padding:0 11px;height:38px}#reloadBtn{display:none!important}.home{padding:28px 14px 32px}h1{font-size:34px}.lead{font-size:15px}}
 </style>
 </head>
 <body>
@@ -72,8 +72,8 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
   <header class="topbar">
     <div class="logo">BIL</div>
     <div class="brand">
-      <b id="pageTitle">BIL Intelligence Portal</b>
-      <span id="pageSub">Field Observation Suite · Analysis</span>
+      <b id="pageTitle">BIL Professional Suite</b>
+      <span id="pageSub">Observation · Analysis · Decision Support</span>
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="homeBtn" type="button">← Home</button>
@@ -84,8 +84,9 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
   <main>
     <section class="home" id="home">
       <div class="kicker">Behavioural Intelligence Lab</div>
-      <h1>One portal. Every high-stakes observation tool.</h1>
-      <p class="lead">Immutable field logs with BTE + DRS, adult safeguarding and domestic abuse tools, behavioural profiling — all local-first on this device.</p>
+      <h1>Professional behavioural intelligence for high-stakes decisions.</h1>
+      <p class="lead">Structured field observation, safeguarding records and calibrated behavioural analysis—built around BTE, DRS, the Four States and the Five Cs.</p>
+      <div class="trust-row"><span>Local-first field records</span><span>Evidence before opinion</span><span>Professional decision support</span></div>
 
       <!-- FIELD SUITE -->
       <div class="section">
@@ -121,21 +122,15 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 
       <!-- PERFORMANCE + ANALYSIS -->
       <div class="section">
-        <div class="section-title">Performance & Analysis</div>
+        <div class="section-title">Behavioural Analysis</div>
         <div class="grid-2">
-          <article class="card journal" data-tool="journal">
-            <div class="num">04 / PERFORMANCE</div>
-            <div class="icon">▤</div>
-            <h2>Week Journal</h2>
-            <p>Plan the week, execute daily priorities, review performance and surface recurring behavioural patterns.</p>
-            <div class="open"><span>Open Week Journal</span><span>→</span></div>
-          </article>
+          
           <article class="card profiler" data-tool="profiler">
-            <div class="num">05 / ANALYSIS</div>
+            <div class="num">04 / ANALYSIS</div>
             <div class="icon">⌁</div>
-            <h2>The Profiler</h2>
-            <p>Profile prospects, run behavioural self-assessment and generate focused seven-day coaching drills (Claude API).</p>
-            <div class="open"><span>Open The Profiler</span><span>→</span></div>
+            <h2>BIL Behaviour Engine</h2>
+            <p>Analyse observations and transcripts through BTE, DRS, Four States, Five Cs, Human Needs and BIL professional standards.</p>
+            <div class="open"><span>Open Behaviour Engine</span><span>→</span></div>
           </article>
         </div>
       </div>
@@ -143,7 +138,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
       <div class="security">
         <b>Data separation & safety:</b> Each tool keeps its own localStorage keys. Nothing leaves this device unless you copy/export. Field tools are immutable once saved. Always transfer safeguarding records into your agency system the same day, then clear. BTE and DRS raise questions — they never determine harm.
       </div>
-      <div class="footer-note">BIL Intelligence Portal v2 · Offline-first · Schema 2026-07</div>
+      <div class="footer-note">BIL Professional Suite · Version 1.0 · Schema 2026-07</div>
     </section>
 
     <section class="viewer" id="viewer">
@@ -154,7 +149,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 </div>
 
 <script>
-/* ========== BIL Intelligence Portal v2 ========== */
+/* ========== BIL Professional Suite v1 ========== */
 /* Tools are loaded from external files when available, otherwise from embedded base64.
    For single-file distribution the three field tools are embedded below. */
 
@@ -162,8 +157,7 @@ const META = {
   child:   ['Child Welfare Observation Log', 'Field · BTE + DRS · Children Act'],
   adult:   ['Adult Safeguarding Observation Log', 'Field · BTE + DRS · Care Act 2014'],
   da:      ['Domestic Abuse Observation Log', 'Field · BTE + DRS · DA Act 2021'],
-  journal: ['Week Journal', 'Performance planning · review'],
-  profiler:['The Profiler', 'Behavioural analysis · coaching']
+  profiler:['BIL Behaviour Engine', 'BTE · DRS · Five Cs · Human Needs']
 };
 
 /* External file paths (preferred when the suite is served from a folder) */
@@ -217,11 +211,7 @@ function loadEmbedded(id){
     frame.src = 'about:blank';
     frame.srcdoc = EMBEDDED[id];
   } else {
-    const placeholders = {
-      journal: `<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Week Journal</title>
-<style>body{font-family:system-ui;background:#F7F5F0;color:#1C2321;padding:40px 24px;text-align:center}h1{font-size:28px;margin-bottom:12px}p{color:#6B7370;max-width:420px;margin:0 auto 24px;line-height:1.5}.btn{display:inline-block;background:#1C2321;color:#fff;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:700}</style></head>
-<body><h1>Week Journal</h1><p>The performance journal is being finalised as a standalone BIL Field Tool. It will appear here in the next release.</p><a class="btn" href="#" onclick="parent.postMessage('home','*');return false">← Back to portal</a></body></html>`
-    };
+    const placeholders = {};
     frame.onload = () => loading.classList.add('hide');
     frame.src = 'about:blank';
     frame.srcdoc = placeholders[id] || '<p style="padding:40px;font-family:system-ui">Tool not available.</p>';
@@ -236,8 +226,8 @@ function goHome(){
   home.style.display = 'block';
   homeBtn.style.display = 'none';
   reloadBtn.style.display = 'none';
-  pageTitle.textContent = 'BIL Intelligence Portal';
-  pageSub.textContent = 'Field Observation Suite · Analysis';
+  pageTitle.textContent = 'BIL Professional Suite';
+  pageSub.textContent = 'Observation · Analysis · Decision Support';
   history.replaceState(null,'',location.pathname + location.search);
 }
 
