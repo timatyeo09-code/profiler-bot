@@ -1,50 +1,23 @@
-BIL PROFESSIONAL SUITE v3.0 - PROFESSIONAL SUITE v3.0
+BIL PROFESSIONAL SUITE - CLEAN RESET v1.0
 
-PURPOSE
-A complete presentation and controlled-pilot build for stakeholder demonstrations tonight.
-It is responsive across phone, tablet, laptop and desktop.
+UPLOAD TO THE GITHUB REPOSITORY ROOT
+- index.html
+- profiler.html
+- vercel.json
+- README.txt
+- api/profile.js  (profile.js must remain inside the api folder)
 
-INCLUDED
-- Child Welfare Observation Log
-- Adult Safeguarding Observation Log
-- Domestic Abuse Observation Log
-- Complete Case Workspace
-- Visual Behaviour Timeline
-- Searchable BTE Library
-- Behaviour Summary Engine
-- Risk Engine
-- AI Behaviour Assistant
-- Manager Dashboard
-- Professional Reports
-- Government Demonstration page
-- Governance & Assurance Centre
-- Guided Stakeholder Presentation
-- Executive Product Brief
-- PWA/mobile installation support
-
-UPLOAD TO GITHUB ROOT
-index.html
-cases.html
-dashboard.html
-profiler.html
-government-demo.html
-governance.html
-guided-demo.html
-product-brief.html
-manifest.webmanifest
-icon.svg
-sw.js
-vercel.json
-api/profile.js
-
-REQUIRED VERCEL ENVIRONMENT VARIABLE
+VERCEL ENVIRONMENT VARIABLES
+Required:
 ANTHROPIC_API_KEY
 
-OPTIONAL
-ANTHROPIC_MODEL=claude-sonnet-4-6
+Optional:
+ANTHROPIC_MODEL
 
-IMPORTANT OPERATIONAL BOUNDARY
-This is a presentation and controlled-pilot product. It is not government-approved, accredited,
-or suitable as the sole official record. Do not use identifiable live case data during a public demo.
-Operational deployment requires authentication, secure shared storage, audit logging, retention,
-DPIA, accessibility testing, security assurance, contractual review and professional safety review.
+IMPORTANT
+- Do not add Next.js configuration files.
+- Do not add a catch-all rewrite to vercel.json.
+- The three field tools are embedded inside index.html.
+- The Week Journal has been removed.
+- The interface is responsive for phones, tablets, laptops and desktops.
+- Use fictional or minimised data until formal security and governance controls are implemented.

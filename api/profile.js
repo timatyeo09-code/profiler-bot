@@ -1,104 +1,80 @@
 export default async function handler(req, res) {
+  res.setHeader('Cache-Control', 'no-store');
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed.' });
+    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY is not configured in Vercel.' });
+  if (!apiKey) {
+    return res.status(500).json({
+      error: 'ANTHROPIC_API_KEY is missing in Vercel Environment Variables.'
+    });
+  }
 
-  const { mode = 'Professional behaviour profile', context = 'General professional', subject = '', content = '', goal = '' } = req.body || {};
-  const source = String(content).trim();
-  if (!source) return res.status(400).json({ error: 'Please provide observations, notes or a transcript.' });
-  if (source.length > 50000) return res.status(413).json({ error: 'The input is too long. Please shorten it to under 50,000 characters.' });
+  const body = req.body || {};
+  const mode = String(body.mode || 'Professional behaviour profile').trim();
+  const context = String(body.context || 'General professional').trim();
+  const subject = String(body.subject || '').trim();
+  const content = String(body.content || '').trim();
+  const goal = String(body.goal || '').trim();
 
-  const system = `You are the BIL Behaviour Engine for Behavioural Intelligence Lab, founded by Tim Atyeo. Write in precise British English.
+  if (!content) {
+    return res.status(400).json({ error: 'Please provide observations, notes or a transcript.' });
+  }
+  if (content.length > 30000) {
+    return res.status(413).json({ error: 'The input is too long. Keep it under 30,000 characters.' });
+  }
 
-BIL OPERATING DOCTRINE:
-- Behaviour is information, not proof.
-- Context beats content.
-- Change from the subject's own baseline beats isolated cues.
-- One cue is noise; a cluster across channels may be signal.
-- Observe before deciding; understand before acting.
-- Evidence must be separated from opinion and inference.
-- Use ethical, respectful, non-manipulative recommendations.
+  const system = `You are the BIL Behaviour Engine for Behavioural Intelligence Lab. Use British English. Separate observable evidence from interpretation. Never claim that a single gesture proves deception, intent, diagnosis, abuse, criminality or risk. Use calibrated language such as "may indicate", "is consistent with" and "requires testing". Consider baseline, change, context, clusters and culture. Statutory guidance, agency procedure and qualified professional judgement always take precedence. Do not diagnose mental illness or personality disorders. Do not provide coercive, manipulative or exploitative tactics.`;
 
-APPLY THESE BIL FRAMEWORKS:
-1. FOUR STATES: GREEN = behavioural baseline; AMBER = first meaningful drift; RED = significant escalation, shutdown, conflict or flooding; BLUE = recovery toward baseline with possible residual vulnerability.
-2. FIVE Cs, in order: Change, Context, Clusters, Culture, Conclusion. Conclusions are probabilities, never facts.
-3. BTE: identify only behavioural or verbal elements genuinely supported by the source. State the plain-English behaviour and, only when confidently matched, its BTE code. Never invent a code.
-4. DRS: treat ratings as structured attention weights, not proof of deception. Do not total scores unless enough clearly timed and grouped evidence is supplied. If you calculate anything, show assumptions and say the threshold is an investigative prompt, not a verdict.
-5. HUMAN NEEDS MAP: consider Significance, Approval, Acceptance, Intelligence, Pity and Strength/Power. Attribute a need only as a working hypothesis supported by repeated language or behaviour.
-6. BEHAVIOUR COMPASS: consider what the person appears to focus on, avoid, seek, protect, control or need from the interaction.
-7. SAFEGUARDING: statutory guidance, organisational policy, direct evidence, supervision and qualified professional judgement always take precedence.
+  const prompt = `REPORT TYPE: ${mode}\nCONTEXT: ${context}\nSUBJECT / REFERENCE: ${subject || 'Not supplied'}\nREQUIRED OUTCOME: ${goal || 'Not supplied'}\n\nSOURCE MATERIAL:\n${content}\n\nReturn a focused professional report using these headings:\n1. Executive Summary\n2. Observable Evidence\n3. Behavioural Changes and Clusters\n4. Alternative Explanations\n5. Working Hypotheses to Test\n6. Questions to Ask Next\n7. Communication Strategy\n8. Risks, Limits and Safeguards\n9. Recommended Next Actions\n\nOnly reference evidence present in the source material. Clearly distinguish evidence from inference. Keep the report practical and concise.`;
 
-HARD LIMITS:
-- Never claim a gesture proves deception, intent, abuse, criminality, coercive control, diagnosis, risk level or personality disorder.
-- Do not diagnose mental illness or neurodevelopmental conditions.
-- Do not provide coercive, exploitative or deceptive influence tactics.
-- Clearly identify missing baseline, weak timing, ambiguous context and alternative explanations.
-- Quote or closely reference only source material supplied by the user.`;
-
-  const prompt = `REPORT TYPE: ${mode}
-CONTEXT: ${context}
-SUBJECT / REFERENCE: ${subject || 'Not supplied'}
-DECISION OR OUTCOME REQUIRED: ${goal || 'Not supplied'}
-
-SOURCE MATERIAL:
-${source}
-
-Produce a professional report using these exact headings:
-
-1. Executive Summary
-2. Evidence Register — Observable Facts Only
-3. Baseline and Four-State Map
-4. Five Cs Analysis
-5. BTE Elements Supported by the Material
-6. DRS / Deception-Pressure Review
-7. Human Needs and Behaviour Compass Hypotheses
-8. Alternative Explanations and Missing Information
-9. Working Hypotheses to Test
-10. Communication and De-escalation Strategy
-11. Questions to Ask Next
-12. Professional Risks, Limits and Safeguarding Considerations
-13. Recommended Next Actions
-
-Requirements:
-- Separate facts, interpretations and hypotheses visibly.
-- Use calibrated wording: may indicate, is consistent with, raises the possibility, requires testing.
-- Where evidence is insufficient, say “Insufficient evidence” rather than filling gaps.
-- For safeguarding contexts, avoid a generic seven-day coaching drill and prioritise immediate professional next steps, documentation, consultation and statutory procedure.
-- Keep the report practical, structured and suitable for professional review.`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45000);
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         'content-type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6',
-        max_tokens: 5000,
-        temperature: 0.15,
+        model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
+        max_tokens: 1800,
+        temperature: 0.2,
         system,
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      console.error('Anthropic error:', data);
-      return res.status(response.status).json({ error: data?.error?.message || 'Anthropic rejected the request.' });
+      const message = data?.error?.message || `Anthropic returned HTTP ${response.status}.`;
+      console.error('Anthropic API error', response.status, data);
+      return res.status(response.status).json({ error: message });
     }
 
     const result = Array.isArray(data.content)
-      ? data.content.filter(x => x.type === 'text').map(x => x.text).join('\n\n')
+      ? data.content.filter(item => item.type === 'text').map(item => item.text).join('\n\n').trim()
       : '';
-    return res.status(200).json({ result, model: data.model, usage: data.usage });
+
+    if (!result) {
+      return res.status(502).json({ error: 'Anthropic returned an empty report. Please try again.' });
+    }
+
+    return res.status(200).json({ result, model: data.model || 'Configured Anthropic model' });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'The server could not reach Anthropic. Please try again.' });
+    if (error?.name === 'AbortError') {
+      return res.status(504).json({ error: 'The analysis exceeded 45 seconds. Try a shorter observation.' });
+    }
+    console.error('Profile function error', error);
+    return res.status(500).json({ error: 'The server could not reach Anthropic. Check the Vercel logs and try again.' });
+  } finally {
+    clearTimeout(timeout);
   }
 }
