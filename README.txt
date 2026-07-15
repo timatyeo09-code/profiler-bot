@@ -1,36 +1,27 @@
-BIL PROFESSIONAL SUITE v3.1 - INTEGRATED BUILD
+BIL PROFESSIONAL SUITE v3.5 - COMPLETE VERSIONS 3.2 TO 3.5
 
-UPLOAD ALL ITEMS TO THE ROOT OF YOUR GITHUB REPOSITORY:
-- index.html
-- cases.html
-- dashboard.html
-- profiler.html
-- government-demo.html
-- governance.html
-- guided-demo.html
-- product-brief.html
-- manifest.webmanifest
-- icon.svg
-- sw.js
-- vercel.json
-- api/profile.js  (keep profile.js inside the api folder)
+ADDED IN v3.2
+- Automatic case reference generation
+- Auto-save for existing case overview fields
+- Search and recent-case ordering
+- Timestamped case notes
+- Local file and photo attachments up to 2 MB
+- Document references and download/open controls
 
-VERCEL ENVIRONMENT VARIABLES
-Required: ANTHROPIC_API_KEY
-Optional: ANTHROPIC_MODEL
+ADDED IN v3.3
+- Visual chronology and Four-State timeline
+- Timeline filters and behavioural-pressure trend
 
-WHAT IS INCLUDED
-- Child Welfare Observation Log
-- Adult Safeguarding Observation Log
-- Domestic Abuse Observation Log
-- Case Workspace and chronology
-- Manager Dashboard
-- BIL Behaviour Engine
-- Governance and assurance page
-- Government demonstration page
-- Guided stakeholder presentation
-- Executive product brief
-- PWA/mobile install support
+ADDED IN v3.4
+- BIL Behaviour Engine 2.0
+- Four States, Five Cs, BTE, DRS, Human Needs and Behaviour Compass prompts
 
-IMPORTANT
-This build stores records in the browser on the current device. Use fictional or minimised data until secure authentication, shared encrypted storage, central audit logging, retention controls and formal assurance are implemented.
+ADDED IN v3.5
+- Supervisor approval workflow
+- Local audit trail and exports
+- Manager dashboard and organisation settings
+- Governance, government demonstration and executive brief
+
+UPLOAD ALL FILES TO THE GITHUB ROOT. KEEP api/profile.js INSIDE THE api FOLDER.
+
+This remains a local-first operational prototype. Live public-sector deployment requires secure authentication, shared encrypted storage, server-side audit logging, DPIA, accessibility and security assurance.

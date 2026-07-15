@@ -153,6 +153,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
         <div class="grid-2">
           <article class="card profiler" data-tool="guided"><div class="num">09 / GUIDED DEMO</div><div class="icon">▶</div><span class="badge bte">Tonight-ready</span><h2>Guided Presentation</h2><p>A structured walkthrough for stakeholder meetings: problem, platform, live workflow, safeguards, pilot and next decision.</p><div class="open"><span>Start Guided Demo</span><span>→</span></div></article>
           <article class="card adult" data-tool="brief"><div class="num">10 / EXECUTIVE BRIEF</div><div class="icon">▤</div><span class="badge bte">One-page proposition</span><h2>Executive Product Brief</h2><p>The value proposition, intended users, current capabilities, pilot offer, outcomes and transparent operational boundary.</p><div class="open"><span>Open Product Brief</span><span>→</span></div></article>
+        <article class="card profiler" data-tool="admin"><div class="num">11 / ADMINISTRATION</div><div class="icon">⚙</div><span class="badge bte">Local roles</span><h2>Organisation Settings</h2><p>Configure organisation details, team directory, local roles and the identity shown in the audit trail.</p><div class="open"><span>Open Settings</span><span>→</span></div></article>
         </div>
       </div>
 
@@ -183,6 +184,7 @@ const META = {
   governance:['Governance & Assurance','Data · Safety · Accessibility'],
   guided:['Guided Presentation','Stakeholder walkthrough · Live demo'],
   brief:['Executive Product Brief','Value · Pilot · Outcomes'],
+  admin:['Organisation Settings','Teams · Roles · Local audit identity'],
   cases:   ['Case Workspace', 'Cases · Chronology · Local records'],
   profiler:['BIL Behaviour Engine', 'BTE · DRS · Five Cs · Human Needs']
 };
@@ -196,7 +198,8 @@ const PAGES = {
   government: 'government-demo.html',
   governance: 'governance.html',
   guided:     'guided-demo.html',
-  brief:      'product-brief.html'
+  brief:      'product-brief.html',
+  admin:      'admin.html'
 };
 
 /* Fallback: we will try to load from files first. If that fails (e.g. file:// or missing),
