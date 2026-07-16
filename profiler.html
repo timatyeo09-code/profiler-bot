@@ -50,7 +50,18 @@ async function runProfile(){
   setBusy(true,'Applying BIL frameworks securely…'); $('output').className='output'; $('output').textContent='Analysing baseline, change, context and clusters…'; $('meta').textContent='';
   const payload={mode:$('mode').value,context:$('context').value,subject:$('subject').value.trim(),content,goal:$('goal').value.trim()};
   try{
-    const r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,stream:true})});
+    let r,attempt=0;
+    while(true){
+      const code=localStorage.getItem('bil-access-code')||'';
+      r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,stream:true,accessCode:code})});
+      if(r.status===401&&attempt===0){
+        const data=await r.json().catch(()=>({}));
+        const entered=prompt(data.error||'Enter your BIL demonstration access code:');
+        if(!entered)throw new Error('An access code is required for AI analysis. Contact BIL for demonstration access.');
+        localStorage.setItem('bil-access-code',entered.trim());attempt++;continue;
+      }
+      break;
+    }
     const ctype=r.headers.get('content-type')||'';
     if(!r.ok){const data=await r.json().catch(()=>({}));throw new Error(data.error||'The analysis request failed.');}
     let full='';

@@ -14,6 +14,17 @@ export default async function handler(req, res) {
   }
 
   const body = req.body || {};
+
+  /* Demonstration gate: set BIL_DEMO_CODE in Vercel env vars to require an
+     access code for engine use (protects the public demo's API spend).
+     Leave BIL_DEMO_CODE unset on customer deployments — engine runs open. */
+  const demoCode = process.env.BIL_DEMO_CODE;
+  if (demoCode && String(body.accessCode || '').trim() !== String(demoCode).trim()) {
+    return res.status(401).json({
+      error: 'This demonstration requires an access code for AI analysis. Enter the code from your BIL invitation.'
+    });
+  }
+
   const mode = String(body.mode || 'Professional behaviour profile').trim();
   const context = String(body.context || 'General professional').trim();
   const subject = String(body.subject || '').trim();
