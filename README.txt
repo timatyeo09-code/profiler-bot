@@ -1,8 +1,8 @@
-BIL PROFESSIONAL SUITE v4.0 - CLOUD-READY FOUNDATION
+BIL PROFESSIONAL SUITE v4.0.4 - CONTROLLED PILOT BUILD
 
 WHAT IS INCLUDED
-- All v3.2-v3.5 case, timeline, dashboard, behaviour-engine and governance modules
-- Secure Access & Cloud Sync page
+- Case, timeline, dashboard, behaviour-engine and governance modules
+- Optional Cloud Integration Roadmap page
 - Supabase email/password authentication integration
 - Manual upload/download of local case records
 - Database schema with profiles, organisations, cases and audit log
@@ -23,7 +23,7 @@ TO ACTIVATE CLOUD MODE
    supabaseUrl: 'https://YOUR-PROJECT.supabase.co'
    supabaseAnonKey: 'YOUR-ANON-PUBLIC-KEY'
 5. Commit and redeploy.
-6. Open Accounts & Cloud Sync, create an account and test with fictional data.
+6. Open Cloud Integration Roadmap, create an account and test with fictional data.
 
 SECURITY
 - The anon key is designed for browser use and is protected by Row Level Security.
@@ -31,7 +31,7 @@ SECURITY
 - The included policies initially isolate cases by user. Organisation-wide sharing should only be enabled after roles and governance are agreed.
 
 OPERATIONAL BOUNDARY
-Version 4.0 is a cloud-ready technical foundation, not a government-accredited live case system. Formal deployment still requires DPIA, approved architecture, contracts, penetration testing, retention controls, accessibility testing, incident response and independent professional safety review.
+Version 4.0.4 is a controlled-pilot technical foundation, not a government-accredited live case system. The public build does not have cloud integration configured. Formal deployment still requires DPIA, approved architecture, contracts, penetration testing, retention controls, accessibility testing, incident response and independent professional safety review.
 
 VERSION 4.0.1 PHONE-READY UPDATE
 - Shared mobile.css added to every standalone page.

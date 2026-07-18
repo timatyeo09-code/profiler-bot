@@ -1,4 +1,4 @@
-const CACHE='bil-v4.3-cloud';
+const CACHE='bil-v4.0.4-pilot';
 const ASSETS=['/','/index.html','/cases.html','/dashboard.html','/profiler.html','/government-demo.html','/governance.html','/guided-demo.html','/product-brief.html','/cloud.html','/admin.html','/mobile.css','/config.js','/js/bil-cloud.js','/manifest.webmanifest','/icon.svg'];
 const STATIC=/\.(css|js|svg|png|webmanifest)$/;
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="apple-mobile-web-app-title" content="BIL Suite">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +36,16 @@ main{flex:1;min-height:0;position:relative}
 .home{max-width:1180px;margin:0 auto;padding:48px 22px 56px}
 .kicker{color:var(--cyan);font-weight:800;font-size:12px;letter-spacing:.17em;text-transform:uppercase}
 h1{font-size:clamp(32px,5.5vw,58px);line-height:.98;letter-spacing:-.055em;margin:12px 0 14px;max-width:860px}
-.lead{color:var(--muted);font-size:16.5px;line-height:1.65;max-width:720px;margin:0 0 36px}
+.lead{color:var(--muted);font-size:16.5px;line-height:1.65;max-width:760px;margin:0 0 22px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 20px}
+.hero-action{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);border-radius:11px;padding:12px 16px;font-weight:800;min-height:46px}
+.hero-action.primary{background:var(--blue);border-color:var(--blue)}
+.hero-action:hover{border-color:var(--cyan);background:rgba(97,183,255,.1)}
+.hero-action.primary:hover{background:#176bea}
+.proof-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 38px;max-width:820px}
+.proof-item{border-left:3px solid var(--cyan);background:rgba(255,255,255,.035);padding:11px 13px;border-radius:0 10px 10px 0}
+.proof-item b{display:block;font-size:18px;color:var(--ink)}
+.proof-item span{display:block;font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}
 .section{margin-bottom:36px}
 .section-title{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
 .section-title::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.08)}
@@ -43,6 +53,7 @@ h1{font-size:clamp(32px,5.5vw,58px);line-height:.98;letter-spacing:-.055em;margi
 .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:linear-gradient(160deg,rgba(20,40,67,.96),rgba(10,24,42,.96));border-radius:20px;padding:22px;min-height:240px;display:flex;flex-direction:column;box-shadow:var(--shadow);cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease}
 .card:hover{transform:translateY(-5px);border-color:rgba(97,183,255,.55)}
+.card:focus-visible,.hero-action:focus-visible,.icon-btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .card::after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-70px;bottom:-75px;background:var(--glow);filter:blur(2px);opacity:.16}
 .card .num{font-size:11px;letter-spacing:.16em;color:var(--muted);font-weight:800}
 .card .icon{font-size:28px;margin:18px 0 14px}
@@ -66,7 +77,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 .loading.hide{display:none}
 .footer-note{margin-top:18px;font-size:12px;color:var(--muted);text-align:center}
 @media(max-width:900px){.grid,.grid-2{grid-template-columns:1fr}.card{min-height:200px}.home{padding-top:36px}}
-@media(max-width:760px){.grid,.grid-2{grid-template-columns:1fr}.card{min-height:190px}.topbar{position:sticky;top:0}.home{padding-left:14px;padding-right:14px}.security{font-size:12px}}
+@media(max-width:760px){.grid,.grid-2{grid-template-columns:1fr}.card{min-height:190px}.topbar{position:sticky;top:0}.home{padding-left:14px;padding-right:14px}.security{font-size:12px}.proof-strip{grid-template-columns:1fr}.hero-action{flex:1 1 230px}}
 @media(max-width:560px){.topbar{height:62px;padding:0 12px}.logo{width:38px;height:38px}.brand b{font-size:14px}.brand span{font-size:9px}.icon-btn{padding:0 11px;height:38px}#reloadBtn{display:none!important}.home{padding:28px 14px 32px}h1{font-size:34px}.lead{font-size:15px}}
 </style>
 <link rel="stylesheet" href="mobile.css">
@@ -89,7 +100,17 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
     <section class="home" id="home">
       <div class="kicker">Behavioural Intelligence Lab</div>
       <h1>Professional behavioural intelligence for high-stakes decisions.</h1>
-      <p class="lead">Structured observation, safeguarding records, case chronology and calibrated behavioural analysis—built around BTE, DRS, the Four States and the Five Cs.</p>
+      <p class="lead">Structured observation, safeguarding records, case chronology and calibrated behavioural analysis—built around the Behavioural Table of Elements (BTE), cautious DRS weighting, the Four States and the Five Cs.</p>
+      <div class="hero-actions" aria-label="Recommended starting points">
+        <button class="hero-action primary" type="button" data-tool="guided">Start Guided Demonstration</button>
+        <button class="hero-action" type="button" data-tool="brief">View Executive Product Brief</button>
+        <button class="hero-action" type="button" data-tool="governance">Review Governance &amp; Assurance</button>
+      </div>
+      <div class="proof-strip" aria-label="BIL experience">
+        <div class="proof-item"><b>29 years</b><span>analysing human behaviour</span></div>
+        <div class="proof-item"><b>2,000+</b><span>healthcare professionals trained</span></div>
+        <div class="proof-item"><b>5,000+</b><span>behavioural assessments completed</span></div>
+      </div>
 
       <!-- FIELD SUITE -->
       <div class="section">
@@ -100,7 +121,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
             <div class="icon">◉</div>
             <span class="badge bte">BTE · DRS</span>
             <h2>Child Welfare Log</h2>
-            <p>Baseline, Green/Amber/Red/Blue states, Five Cs gate, BTE tick-boxes, DRS total, disclosures and court-ready record.</p>
+            <p>Baseline, Green/Amber/Red/Blue states, Five Cs gate, BTE tick-boxes, DRS total, disclosures and a structured record for professional review and transfer.</p>
             <div class="open"><span>Open Child Welfare</span><span>→</span></div>
           </article>
           <article class="card adult" data-tool="adult">
@@ -108,7 +129,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
             <div class="icon">◈</div>
             <span class="badge bte">BTE · DRS</span>
             <h2>Adult Safeguarding Log</h2>
-            <p>Care Act aligned. Baseline, state changes, BTE behaviours, DRS calculator, Making Safeguarding Personal and s.42 pathway.</p>
+            <p>Structured around Care Act 2014 safeguarding practice in England. Baseline, state changes, BTE behaviours, cautious DRS weighting and the section 42 pathway.</p>
             <div class="open"><span>Open Adult Safeguarding</span><span>→</span></div>
           </article>
           <article class="card da" data-tool="da">
@@ -117,7 +138,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
             <span class="badge bte">BTE · DRS</span>
             <span class="badge drs">Coercive control</span>
             <h2>Domestic Abuse Log</h2>
-            <p>DA Act 2021 focus. Pattern recognition, children as victims, recovery mapping, BTE + DRS and MARAC-ready record.</p>
+            <p>Structured around Domestic Abuse Act 2021 practice in England and Wales. Pattern recognition, recovery mapping and a reviewable MARAC-support record.</p>
             <div class="open"><span>Open Domestic Abuse</span><span>→</span></div>
           </article>
         </div>
@@ -132,7 +153,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
           <article class="card profiler" data-tool="government"><div class="num">05 / PRESENTATION</div><div class="icon">◆</div><span class="badge bte">Pilot briefing</span><h2>Government Demonstration</h2><p>Executive overview, safeguarded use case, pilot pathway, outcomes and evidence limitations for stakeholder presentations.</p><div class="open"><span>Open Demonstration</span><span>→</span></div></article>
           <article class="card profiler" data-tool="governance"><div class="num">06 / GOVERNANCE</div><div class="icon">◇</div><span class="badge bte">Assurance</span><h2>Governance & Assurance</h2><p>Data handling, professional limitations, accessibility, security roadmap and requirements before operational deployment.</p><div class="open"><span>Open Assurance</span><span>→</span></div></article>
           <article class="card adult" data-tool="cases">
-            <div class="num">07 / CASE MANAGEMENT</div>
+            <div class="num">07 / CASE WORKSPACE</div>
             <div class="icon">▦</div>
             <span class="badge bte">Local-first</span>
             <h2>Case Workspace</h2>
@@ -152,17 +173,17 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
       <div class="section">
         <div class="section-title">Presentation & Product</div>
         <div class="grid-2">
-          <article class="card profiler" data-tool="guided"><div class="num">09 / GUIDED DEMO</div><div class="icon">▶</div><span class="badge bte">Tonight-ready</span><h2>Guided Presentation</h2><p>A structured walkthrough for stakeholder meetings: problem, platform, live workflow, safeguards, pilot and next decision.</p><div class="open"><span>Start Guided Demo</span><span>→</span></div></article>
+          <article class="card profiler" data-tool="guided"><div class="num">09 / GUIDED DEMO</div><div class="icon">▶</div><span class="badge bte">Stakeholder-ready</span><h2>Guided Presentation</h2><p>A structured walkthrough for stakeholder meetings: problem, platform, live workflow, safeguards, pilot and next decision.</p><div class="open"><span>Start Guided Demo</span><span>→</span></div></article>
           <article class="card adult" data-tool="brief"><div class="num">10 / EXECUTIVE BRIEF</div><div class="icon">▤</div><span class="badge bte">One-page proposition</span><h2>Executive Product Brief</h2><p>The value proposition, intended users, current capabilities, pilot offer, outcomes and transparent operational boundary.</p><div class="open"><span>Open Product Brief</span><span>→</span></div></article>
-        <article class="card profiler" data-tool="cloud"><div class="num">11 / SECURE ACCESS</div><div class="icon">🔐</div><span class="badge bte">Cloud-ready</span><h2>Accounts & Cloud Sync</h2><p>Sign in, connect a shared database and synchronise local case records across approved devices.</p><div class="open"><span>Open Secure Access</span><span>→</span></div></article>
+        <article class="card profiler" data-tool="cloud"><div class="num">11 / INTEGRATION ROADMAP</div><div class="icon">🔐</div><span class="badge bte">Not configured</span><h2>Cloud Integration Roadmap</h2><p>Review the optional account and shared-database prototype, together with the controls required before organisational deployment.</p><div class="open"><span>View Integration Roadmap</span><span>→</span></div></article>
           <article class="card profiler" data-tool="admin"><div class="num">12 / ADMINISTRATION</div><div class="icon">⚙</div><span class="badge bte">Local roles</span><h2>Organisation Settings</h2><p>Configure organisation details, team directory, local roles and the identity shown in the audit trail.</p><div class="open"><span>Open Settings</span><span>→</span></div></article>
         </div>
       </div>
 
       <div class="security">
-        <b>Data separation & safety:</b> Each tool keeps its own localStorage keys. Nothing leaves this device unless you copy/export. Field tools are immutable once saved. Always transfer safeguarding records into your agency system the same day, then clear. BTE and DRS raise questions — they never determine harm.
+        <b>Data separation &amp; safety:</b> Field and case records remain in this browser unless you export or use a configured cloud integration. AI analysis is different: text you submit to the Behaviour Engine or case AI tools is sent to the configured AI service through the BIL API. Use only fictional, synthetic or appropriately de-identified material in this demonstration build. Transfer any authorised safeguarding record into your agency system the same day, then clear it. BTE and DRS raise questions—they never determine harm.
       </div>
-      <div class="footer-note">BIL Professional Suite · Version 4.0.3 · Cloud-Ready Build</div>
+      <div class="footer-note">BIL Professional Suite · Version 4.0.4 · Controlled Pilot Build</div>
     </section>
 
     <section class="viewer" id="viewer">
@@ -173,7 +194,7 @@ iframe{width:100%;height:100%;border:0;background:#fff;display:block}
 </div>
 
 <script>
-/* ========== BIL Professional Suite v3.1 ========== */
+/* ========== BIL Professional Suite v4.0.4 ========== */
 /* Tools are loaded from external files when available, otherwise from embedded base64.
    For single-file distribution the three field tools are embedded below. */
 
@@ -187,7 +208,7 @@ const META = {
   guided:['Guided Presentation','Stakeholder walkthrough · Live demo'],
   brief:['Executive Product Brief','Value · Pilot · Outcomes'],
   admin:['Organisation Settings','Teams · Roles · Local audit identity'],
-  cloud:['Accounts & Cloud Sync','Sign in · Supabase · Case synchronisation'],
+  cloud:['Cloud Integration Roadmap','Optional accounts · Shared storage · Assurance'],
   cases:   ['Case Workspace', 'Cases · Chronology · Local records'],
   profiler:['BIL Behaviour Engine', 'BTE · DRS · Five Cs · Human Needs']
 };
@@ -263,6 +284,17 @@ function goHome(){
   history.replaceState(null,'',location.pathname + location.search);
 }
 
+document.querySelectorAll('.card[data-tool]').forEach(card => {
+  card.setAttribute('role', 'link');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', `${card.querySelector('h2')?.textContent || 'Open tool'} — open`);
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openTool(card.dataset.tool);
+    }
+  });
+});
 document.querySelectorAll('[data-tool]').forEach(card => {
   card.addEventListener('click', () => openTool(card.dataset.tool));
 });
