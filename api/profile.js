@@ -1,3 +1,5 @@
+import { demoWatermark, requireEngineAccess } from './_auth.js';
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -14,16 +16,8 @@ export default async function handler(req, res) {
   }
 
   const body = req.body || {};
-
-  /* Demonstration gate: set BIL_DEMO_CODE in Vercel env vars to require an
-     access code for engine use (protects the public demo's API spend).
-     Leave BIL_DEMO_CODE unset on customer deployments — engine runs open. */
-  const demoCode = process.env.BIL_DEMO_CODE;
-  if (demoCode && String(body.accessCode || '').trim() !== String(demoCode).trim()) {
-    return res.status(401).json({
-      error: 'This demonstration requires an access code for AI analysis. Enter the code from your BIL invitation.'
-    });
-  }
+  const access = await requireEngineAccess(req, res);
+  if (!access) return;
 
   const mode = String(body.mode || 'Professional behaviour profile').trim();
   const context = String(body.context || 'General professional').trim();
@@ -87,6 +81,9 @@ export default async function handler(req, res) {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      if (access.tier === 'demo') {
+        res.write('DEMONSTRATION OUTPUT — NOT FOR OPERATIONAL OR CASE-RECORD USE\n\n');
+      }
       try {
         while (true) {
           const { done, value } = await reader.read();
@@ -139,7 +136,12 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'Anthropic returned an empty report. Please try again.' });
     }
 
-    return res.status(200).json({ result, model: data.model || 'Configured Anthropic model', usage: data.usage || null });
+    return res.status(200).json({
+      result: demoWatermark(result, access.tier),
+      model: data.model || 'Configured Anthropic model',
+      usage: data.usage || null,
+      tier: access.tier
+    });
   } catch (error) {
     if (error?.name === 'AbortError') {
       return res.status(504).json({ error: 'The analysis exceeded the time limit. Try a shorter observation.' });

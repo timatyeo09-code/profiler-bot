@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>Secure sign in · BIL Professional Suite</title>
+  <style>
+    :root{--bg:#07111f;--panel:#0e1b2e;--line:#24405f;--ink:#f4f7fb;--muted:#9fb0c5;--blue:#2478ff;--cyan:#61b7ff;--green:#54c987;--danger:#ff6c7a}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 8% 0%,rgba(36,120,255,.22),transparent 38%),linear-gradient(180deg,#06101d,#091526);color:var(--ink)}
+    .shell{width:min(100%,480px)}.eyebrow{color:var(--cyan);font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:11px}.card{margin-top:18px;background:linear-gradient(160deg,rgba(20,40,67,.98),rgba(10,24,42,.98));border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:25px;box-shadow:0 28px 70px rgba(0,0,0,.3)}
+    h1{font-size:clamp(32px,8vw,48px);line-height:1;margin:10px 0;letter-spacing:-.04em}.lead,.status{color:var(--muted);line-height:1.55}label{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;margin:14px 0 6px}input{width:100%;background:#07111f;color:var(--ink);border:1px solid var(--line);border-radius:11px;padding:13px;font:inherit}.actions{display:grid;gap:9px;margin-top:16px}.btn{border:1px solid var(--line);background:transparent;color:var(--ink);padding:13px 15px;border-radius:11px;font-weight:800;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue)}.status{margin-top:14px}.ok{color:var(--green)}.err{color:var(--danger)}.divider{height:1px;background:var(--line);margin:20px 0}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="eyebrow">Behavioural Intelligence Lab</div>
+    <h1>Secure access</h1>
+    <p class="lead">Individual access to the BIL Professional Suite.</p>
+    <section class="card">
+      <div id="loginFields">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password">
+        <div class="actions">
+          <button class="btn primary" id="signIn">Sign in</button>
+          <button class="btn" id="magicLink">Email me a secure sign-in link</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <label for="invite">Invitation code</label>
+      <input id="invite" autocomplete="one-time-code" placeholder="Optional">
+      <button class="btn" id="redeem" style="width:100%;margin-top:10px">Apply invitation code</button>
+      <div id="status" class="status">Checking secure access…</div>
+    </section>
+  </main>
+  <script src="js/bil-auth.js"></script>
+  <script>
+    const $=id=>document.getElementById(id);
+    const next=new URLSearchParams(location.search).get('next')||'/';
+    const status=(text,kind='')=>{$('status').textContent=text;$('status').className=`status ${kind}`};
+    async function start(){
+      const result=await BILAuth.init({requireAuth:false});
+      if(result.mode==='legacy'){status('Individual accounts are not activated yet. The existing controlled demo remains available.','err');return}
+      if(BILAuth.state.session){status('Signed in. Opening the suite…','ok');setTimeout(()=>location.replace(next),350)}
+      else status('Enter your account details or request a secure email link.');
+    }
+    async function client(){
+      const result=await BILAuth.init({requireAuth:false});
+      if(result.mode==='legacy'||!BILAuth.state.client)throw new Error('Secure accounts are not available yet.');
+      return BILAuth.state.client;
+    }
+    $('signIn').onclick=async()=>{try{status('Signing in…');const authClient=await client();const r=await authClient.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(r.error)throw r.error;location.replace(next)}catch(e){status(e.message,'err')}};
+    $('magicLink').onclick=async()=>{try{const email=$('email').value.trim();if(!email)throw new Error('Enter your email address first.');const authClient=await client();const r=await authClient.auth.signInWithOtp({email,options:{emailRedirectTo:new URL(next,location.origin).href}});if(r.error)throw r.error;status('Check your email for the secure sign-in link.','ok')}catch(e){status(e.message,'err')}};
+    $('redeem').onclick=async()=>{try{if(!BILAuth.state.session)throw new Error('Sign in before applying an invitation code.');const headers=await BILAuth.authHeaders();const r=await fetch('/api/redeem-invite',{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify({code:$('invite').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);status(`Invitation applied: ${d.tier} access. Opening the suite…`,'ok');setTimeout(()=>location.replace(next),600)}catch(e){status(e.message,'err')}};
+    start().catch(e=>status(e.message,'err'));
+  </script>
+</body>
+</html>

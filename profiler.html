@@ -16,6 +16,7 @@ label{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-tran
 @media print{body{background:#fff;color:#111}.hero,.grid>section:first-child,.actions,.meta,label{display:none!important}.grid{display:block}.card{box-shadow:none;border:0;background:#fff;color:#111}.output{max-height:none;overflow:visible;color:#111}}
 </style>
 <link rel="stylesheet" href="mobile.css">
+<script src="js/bil-auth.js"></script>
 </head>
 <body>
 <main class="wrap">
@@ -55,9 +56,11 @@ async function runProfile(){
     let r,attempt=0;
     while(true){
       const code=localStorage.getItem('bil-access-code')||'';
-      r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,stream:true,accessCode:code})});
+      const authHeaders=await BILAuth.authHeaders();
+      r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders},body:JSON.stringify({...payload,stream:true,accessCode:code})});
       if(r.status===401&&attempt===0){
         const data=await r.json().catch(()=>({}));
+        if(BILAuth.state.enabled)throw new Error(data.error||'Your secure session has expired. Sign in again.');
         const entered=prompt(data.error||'Enter your BIL demonstration access code:');
         if(!entered)throw new Error('An access code is required for AI analysis. Contact BIL for demonstration access.');
         localStorage.setItem('bil-access-code',entered.trim());attempt++;continue;

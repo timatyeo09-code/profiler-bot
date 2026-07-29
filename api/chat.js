@@ -1,3 +1,5 @@
+import { demoWatermark, requireEngineAccess } from './_auth.js';
+
 // =============================================================
 // THE PROFILER — Server-side API endpoint
 // =============================================================
@@ -19,6 +21,9 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const access = await requireEngineAccess(req, res);
+  if (!access) return;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -60,7 +65,7 @@ export default async function handler(req, res) {
     const data = await response.json();
     const reply = data.content?.[0]?.text || '';
 
-    return res.status(200).json({ reply });
+    return res.status(200).json({ reply: demoWatermark(reply, access.tier), tier: access.tier });
   } catch (err) {
     console.error('Handler error:', err);
     return res.status(500).json({ error: err.message });
