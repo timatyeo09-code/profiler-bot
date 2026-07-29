@@ -46,8 +46,13 @@
       if(BILAuth.state.session){status('Signed in. Opening the suite…','ok');setTimeout(()=>location.replace(next),350)}
       else status('Enter your account details or request a secure email link.');
     }
-    $('signIn').onclick=async()=>{try{status('Signing in…');const r=await BILAuth.state.client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(r.error)throw r.error;location.replace(next)}catch(e){status(e.message,'err')}};
-    $('magicLink').onclick=async()=>{try{const email=$('email').value.trim();if(!email)throw new Error('Enter your email address first.');const r=await BILAuth.state.client.auth.signInWithOtp({email,options:{emailRedirectTo:new URL(next,location.origin).href}});if(r.error)throw r.error;status('Check your email for the secure sign-in link.','ok')}catch(e){status(e.message,'err')}};
+    async function client(){
+      const result=await BILAuth.init({requireAuth:false});
+      if(result.mode==='legacy'||!BILAuth.state.client)throw new Error('Secure accounts are not available yet.');
+      return BILAuth.state.client;
+    }
+    $('signIn').onclick=async()=>{try{status('Signing in…');const authClient=await client();const r=await authClient.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(r.error)throw r.error;location.replace(next)}catch(e){status(e.message,'err')}};
+    $('magicLink').onclick=async()=>{try{const email=$('email').value.trim();if(!email)throw new Error('Enter your email address first.');const authClient=await client();const r=await authClient.auth.signInWithOtp({email,options:{emailRedirectTo:new URL(next,location.origin).href}});if(r.error)throw r.error;status('Check your email for the secure sign-in link.','ok')}catch(e){status(e.message,'err')}};
     $('redeem').onclick=async()=>{try{if(!BILAuth.state.session)throw new Error('Sign in before applying an invitation code.');const headers=await BILAuth.authHeaders();const r=await fetch('/api/redeem-invite',{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify({code:$('invite').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);status(`Invitation applied: ${d.tier} access. Opening the suite…`,'ok');setTimeout(()=>location.replace(next),600)}catch(e){status(e.message,'err')}};
     start().catch(e=>status(e.message,'err'));
   </script>
