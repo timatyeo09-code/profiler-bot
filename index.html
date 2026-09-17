@@ -243,6 +243,7 @@ const pageSub = document.getElementById('pageSub');
 let activeTool = null;
 
 function openTool(id){
+  if(['child','adult','da'].includes(id))window.BILAuth?.trackTool(id);
   activeTool = id;
   loading.classList.remove('hide');
   viewer.classList.add('active');

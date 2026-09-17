@@ -1,4 +1,5 @@
 import { demoWatermark, requireEngineAccess } from './_auth.js';
+import { recordUsage } from './_usage.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -32,6 +33,7 @@ export default async function handler(req, res) {
   if (content.length > 30000) {
     return res.status(413).json({ error: 'The input is too long. Keep it under 30,000 characters.' });
   }
+  await recordUsage(access, 'analysis_requested', 'profiler');
 
   const system = `You are the BIL Behaviour Engine for Behavioural Intelligence Lab. Use British English. Separate observable evidence from interpretation. Never claim that a single gesture proves deception, intent, diagnosis, abuse, criminality or risk. Use calibrated language such as "may indicate", "is consistent with" and "requires testing". Apply the BIL method: baseline, change, context, clusters, culture and calibrated conclusion. Where relevant, organise material through the Four States (Green baseline, Amber drift, Red escalation, Blue recovery), BTE references, cautious DRS weighting, Human Needs hypotheses and the Behaviour Compass. Never invent a BTE code or score not supplied by the user. Statutory guidance, agency procedure and qualified professional judgement always take precedence. Do not diagnose mental illness or personality disorders. Do not provide coercive, manipulative or exploitative tactics.`;
 

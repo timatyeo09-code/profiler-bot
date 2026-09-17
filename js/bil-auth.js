@@ -53,6 +53,20 @@
         throw new Error(data.error || 'Your BIL account could not be verified.');
       }
       state.profile = data.profile;
+      state.isOwner = data.is_owner === true;
+      state.usageEnabled = data.usage_enabled === true;
+      if (window.self === window.top && state.isOwner && !location.pathname.endsWith('/owner.html')) {
+        const link=document.createElement('a');
+        link.href='/owner.html';link.textContent='Owner dashboard';
+        link.style.cssText='position:fixed;bottom:16px;right:16px;z-index:9999;padding:10px 16px;background:#f5a524;color:#15100a;border-radius:10px;font:600 14px system-ui;text-decoration:none';
+        document.body.appendChild(link);
+      }
+      if(window.self === window.top && state.usageEnabled && !location.pathname.endsWith('/login.html')) {
+        const notice=document.createElement('p');
+        notice.textContent='BIL records account access, tool openings and AI request counts for service oversight. Case notes and AI content are not included in usage reports.';
+        notice.style.cssText='padding:10px 16px;margin:0;font:12px/1.5 system-ui;background:#142032;color:#c7d2e0';
+        document.body.prepend(notice);
+      }
       document.documentElement.dataset.bilTier = data.tier;
       document.documentElement.dataset.bilRole = data.profile?.role || '';
       window.dispatchEvent(new CustomEvent('bil-access-ready', { detail: data }));
@@ -74,11 +88,25 @@
     location.replace('/login.html');
   }
 
-  window.BILAuth = { init, authHeaders, signOut, state };
+  async function trackTool(module) {
+    try {
+      await init();
+      if(!state.usageEnabled||!state.session)return;
+      // Self-reported navigation only, not a tamper-proof audit or duration measurement.
+      const headers=await authHeaders();
+      await fetch('/api/usage',{method:'POST',headers:{'Content-Type':'application/json',...headers},
+        body:JSON.stringify({module,id:crypto.randomUUID()})});
+    }catch{/* Navigation remains available if reporting is temporarily unavailable. */}
+  }
+
+  window.BILAuth = { init, authHeaders, signOut, trackTool, state };
   if (!location.pathname.endsWith('/login.html')) {
     document.documentElement.style.visibility = 'hidden';
     init().then(() => {
       document.documentElement.style.visibility = '';
+      // Embedded field tools are counted by the portal shell; external pages count themselves.
+      const modules={'/':'suite','/index.html':'suite','/cases.html':'cases','/dashboard.html':'dashboard','/profiler.html':'profiler','/government-demo.html':'government','/governance.html':'governance','/guided-demo.html':'guided','/product-brief.html':'brief','/cloud.html':'cloud','/admin.html':'admin','/owner.html':'owner'};
+      if(modules[location.pathname])trackTool(modules[location.pathname]);
     }).catch(error => {
       document.documentElement.style.visibility = '';
       document.body.innerHTML = `<main style="max-width:680px;margin:80px auto;padding:24px;font-family:system-ui;color:#17212b"><h1>Access unavailable</h1><p>${String(error.message || error)}</p><p><a href="/login.html">Return to sign in</a></p></main>`;

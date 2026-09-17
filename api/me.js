@@ -1,4 +1,5 @@
 import { authenticate } from './_auth.js';
+import { isOwner, recordUsage, usageEnabled } from './_usage.js';
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -11,10 +12,13 @@ export default async function handler(req, res) {
   if (access.error) return res.status(access.status).json({ error: access.error });
   if (access.mode === 'legacy') return res.status(200).json({ mode: 'legacy', tier: 'demo' });
 
+  await recordUsage(access, 'access_checked', 'suite');
   return res.status(200).json({
     mode: 'authenticated',
     user: { id: access.user.id, email: access.user.email },
     profile: access.profile,
-    tier: access.tier
+    tier: access.tier,
+    is_owner: isOwner(access.user.id),
+    usage_enabled: usageEnabled()
   });
 }
