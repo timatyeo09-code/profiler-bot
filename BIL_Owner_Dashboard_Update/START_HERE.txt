@@ -1,0 +1,33 @@
+BIL OWNER DASHBOARD — START HERE
+
+This is an implementation draft, NOT a live activated dashboard.
+It adds a private owner view for accounts, organisations, recorded activity,
+access expiry and saved daily usage summaries. No client case text is included.
+
+1. Keep a backup of the existing GitHub project.
+2. Create a separate branch for this update and copy these files into matching
+   paths at the repository root. Do not upload the ZIP itself or put its
+   contents inside an extra enclosing folder. Preserve unrelated project files.
+3. Read OWNER_REPORTING.md. A developer needs to apply the new SQL migration
+   in staging and configure your owner UUID and server environment variables.
+   Never send passwords or service keys in chat or put them in GitHub files.
+4. Run the tests, verify the database permissions, and check the dashboard
+   in a browser before merging or enabling usage collection in production.
+5. After deployment and configuration, sign in with your approved owner
+   account and use the Owner dashboard link.
+
+WHAT IS VERIFIED
+Five mocked API test groups pass, covering owner access, event identity,
+scheduler authentication, date checks and failure behaviour. JS syntax passes.
+Live Supabase integration and browser visual checks are not completed.
+GitHub upload was blocked by integration permissions; the live site is unchanged.
+
+DAILY REPORTS
+The configured production scheduler saves a summary at 06:00 UTC for the
+previous UTC day. Reports appear in the dashboard. They are not emailed.
+Named recent activity is visible live to the owner; saved aggregate reports
+exclude named histories. Tracking begins after activation, not retrospectively.
+
+Package based on main commit 6240d80387998045b3eb348f7ba75e6aca4eb75b.
+If your repository has changed since then, merge the changes instead of
+blindly replacing files. This package is an update, not the entire website.
