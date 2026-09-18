@@ -36,7 +36,15 @@
         <button class="btn" id="showSignup" type="button" aria-expanded="false" aria-controls="signupForm" style="width:100%">Create an account</button>
         <form id="signupForm" hidden aria-labelledby="signupHeading">
           <h2 class="signup-title" id="signupHeading">Create your account</h2>
-          <p class="signup-intro">Use your email address and choose a password for the BIL Professional Suite.</p>
+          <p class="signup-intro">Enter your details and choose a password for the BIL Professional Suite.</p>
+          <label for="signupName">Full name</label>
+          <input id="signupName" name="full_name" type="text" autocomplete="name" required maxlength="120">
+          <label for="signupOrganisation">Organisation</label>
+          <input id="signupOrganisation" name="organisation_name" type="text" autocomplete="organization" required maxlength="200" aria-describedby="organisationHint">
+          <small class="hint" id="organisationHint">For personal use, enter “Independent”.</small>
+          <label for="signupUserId">User ID</label>
+          <input id="signupUserId" type="text" value="Assigned automatically" readonly aria-describedby="userIdHint">
+          <small class="hint" id="userIdHint">Your permanent unique ID will appear in My account after you sign in.</small>
           <label for="signupEmail">Email</label>
           <input id="signupEmail" type="email" autocomplete="username" required maxlength="254">
           <label for="signupPassword">Password</label>
@@ -94,16 +102,21 @@
       $('signupSection').querySelector('.signup-title').hidden=show;
       $('signupPassword').value='';$('signupConfirm').value='';
       $('signupConfirm').setCustomValidity('');
-      if(show){$('signupEmail').value=$('email').value.trim();$('signupEmail').focus();status('Enter your email and choose a password to get started.');}
+      if(show){$('signupEmail').value=$('email').value.trim();$('signupName').focus();status('Enter your name, organisation and email, then choose a password.');}
       else{$('email').focus();status('Enter your account details or request a secure email link.');}
     }
     $('showSignup').onclick=()=>showSignup(true);
     $('cancelSignup').onclick=()=>showSignup(false);
+    for(const id of ['signupName','signupOrganisation'])$(id).oninput=()=>$(id).setCustomValidity('');
     $('signupConfirm').oninput=()=>$('signupConfirm').setCustomValidity('');
     $('signupPassword').oninput=()=>$('signupConfirm').setCustomValidity('');
     $('signupForm').onsubmit=async(event)=>{
       event.preventDefault();
       if(signupPending)return;
+      for(const id of ['signupName','signupOrganisation']){
+        $(id).value=$(id).value.trim();
+        $(id).setCustomValidity($(id).value ? '' : 'Please complete this field.');
+      }
       $('signupEmail').value=$('signupEmail').value.trim();
       $('signupConfirm').setCustomValidity('');
       if(!$('signupForm').reportValidity())return;
@@ -125,7 +138,10 @@
         const result=await authClient.auth.signUp({
           email:$('signupEmail').value,
           password:$('signupPassword').value,
-          options:{emailRedirectTo:callback.href}
+          options:{
+            emailRedirectTo:callback.href,
+            data:{full_name:$('signupName').value,organisation_name:$('signupOrganisation').value}
+          }
         });
         if(result.error)throw result.error;
         $('email').value=$('signupEmail').value;

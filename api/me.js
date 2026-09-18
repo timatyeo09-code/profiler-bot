@@ -13,7 +13,13 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     mode: 'authenticated',
-    user: { id: access.user.id, email: access.user.email },
+    user: {
+      id: access.user.id,
+      email: access.user.email,
+      full_name: typeof access.user.user_metadata?.full_name === 'string' ? access.user.user_metadata.full_name : '',
+      // Self-reported organisation is contact information, never an access grant.
+      organisation_name: typeof access.user.user_metadata?.organisation_name === 'string' ? access.user.user_metadata.organisation_name : ''
+    },
     profile: access.profile,
     tier: access.tier
   });
