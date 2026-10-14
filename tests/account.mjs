@@ -31,7 +31,7 @@ assert.equal(res.body.user.organisation_name,'');
 assert.equal(res.body.user.full_name,'');
 
 const html=fs.readFileSync(new URL('../account.html',import.meta.url),'utf8');
-const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).find(s=>s.includes('showAccount'));
+const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(m=>m[1]).find(s=>s.includes('showAccount'));
 const els=Object.fromEntries([...html.matchAll(/id="([^"]+)"/g)].map(m=>[m[1],{hidden:true,textContent:''}]));
 vm.runInNewContext(script,{BILAuth:{init:async()=>account},document:{getElementById:id=>els[id]}});
 await new Promise(resolve=>setImmediate(resolve));
